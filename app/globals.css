@@ -13,6 +13,11 @@
   padding: 0;
   margin: 0;
   -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-user-drag: none;
 }
 
 html,
@@ -22,12 +27,20 @@ body {
   overflow: hidden;
   background-color: var(--lions-blue);
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+  -webkit-touch-callout: none;
 }
 
 body {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+img {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
 }
 
 /* Base Frame */
@@ -71,11 +84,6 @@ body {
   transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.premium-card:active {
-  transform: scale(0.98);
-  box-shadow: 0 5px 15px rgba(7, 76, 161, 0.03);
-}
-
 /* Bottom Navigation */
 .bottom-nav {
   position: absolute;
@@ -90,7 +98,6 @@ body {
   justify-content: space-around;
   align-items: center;
   padding-bottom: 20px;
-  /* For safe area */
   z-index: 100;
 }
 
@@ -116,11 +123,6 @@ body {
   height: 24px;
   stroke-width: 2;
   transition: all 0.3s ease;
-}
-
-.nav-item.active svg {
-  transform: translateY(-2px);
-  filter: drop-shadow(0 2px 5px rgba(7, 76, 161, 0.2));
 }
 
 /* Buttons */
