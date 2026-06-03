@@ -175,7 +175,7 @@ export default function Home() {
                 <Image src="/logo.svg" alt="최강삼성! 라이온즈" title="최강삼성! 라이온즈" fill style={{ objectFit: 'contain' }} />
               </div>
               <h2>라이언즈 팬 대시보드</h2>
-              <p>삼성 라이온즈 팬 프로젝트 v1.3.3</p>
+              <p>삼성 라이온즈 팬 프로젝트 v1.3.4</p>
             </div>
             <div className="disclaimer">
               <p>본 대시보드는 공개된 데이터를 사용하는 팬 메이드 프로젝트입니다.</p>
@@ -231,8 +231,8 @@ export default function Home() {
         .icon-wrapper { width: 24px; height: 24px; display: flex; justify-content: center; align-items: center; }
         
         .logo-wrapper { position: relative; overflow: hidden; }
-        .glint-effect { position: absolute; top: -100%; left: -100%; width: 300%; height: 300%; background: linear-gradient(135deg, rgba(255, 255, 255, 0) 40%, rgba(255, 255, 255, 0.9) 50%, rgba(255, 255, 255, 0) 60%); transform: rotate(25deg); animation: moveGlint 2s infinite ease-in-out; pointer-events: none; }
-        @keyframes moveGlint { 0% { transform: translateY(-20%) translateX(-20%) rotate(25deg); } 100% { transform: translateY(20%) translateX(20%) rotate(25deg); } }
+        .glint-effect { position: absolute; top: -100%; left: -100%; width: 300%; height: 300%; background: linear-gradient(135deg, rgba(255, 255, 255, 0) 40%, rgba(255, 255, 255, 0.9) 50%, rgba(255, 255, 255, 0) 60%); transform: rotate(25deg); animation: moveGlint 1.2s infinite linear; pointer-events: none; }
+        @keyframes moveGlint { 0% { transform: translateY(-25%) translateX(-25%) rotate(25deg); } 100% { transform: translateY(25%) translateX(25%) rotate(25deg); } }
         @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.4); } 100% { opacity: 1; transform: scale(1); } }
       `}</style>
     </div>
