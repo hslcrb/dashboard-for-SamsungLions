@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { HomeIcon, MatchIcon, RankIcon, MoreIcon } from '../components/Icons';
-import { motion, AnimatePresence, useDragControls } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import PremiumButton from '../components/PremiumButton';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('home');
@@ -157,9 +158,11 @@ export default function Home() {
               </div>
             </div>
 
-            <button className="action-button" style={{ marginTop: '10px' }} onClick={fetchScores}>
-              {isRefreshing ? '데이터 동기화 중...' : '데이터 수동 새로고침'}
-            </button>
+            <div style={{ marginTop: '10px' }}>
+              <PremiumButton onClick={fetchScores}>
+                {isRefreshing ? '데이터 동기화 중...' : '데이터 수동 새로고침'}
+              </PremiumButton>
+            </div>
             <div style={{ height: '30px' }}></div>
           </div>
         );
@@ -208,14 +211,13 @@ export default function Home() {
                 <Image src="/logo.svg" alt="최강삼성! 라이온즈" title="최강삼성! 라이온즈" fill style={{ objectFit: 'contain' }} />
               </div>
               <h2>라이언즈 팬 대시보드</h2>
-              <p>Lion Spirits Fan Project v1.3.7</p>
+              <p>Lion Spirits Fan Project v1.3.8</p>
 
-              <button
-                className="detail-btn"
-                onClick={() => setShowDetails(true)}
-              >
-                기술 스택 자세히 보기
-              </button>
+              <div style={{ marginTop: '20px' }}>
+                <PremiumButton onClick={() => setShowDetails(true)}>
+                  기술 스택 자세히 보기
+                </PremiumButton>
+              </div>
             </div>
 
             <div className="disclaimer">
@@ -246,7 +248,6 @@ export default function Home() {
         ))}
       </nav>
 
-      {/* 기술 스택 상세 모달 (Drag & Better Spacing) */}
       <AnimatePresence>
         {showDetails && (
           <>
@@ -308,9 +309,14 @@ export default function Home() {
                   </a>
                 </div>
 
-                <button className="close-btn" onClick={() => setShowDetails(false)}>
-                  닫기
-                </button>
+                <div style={{ marginTop: '32px' }}>
+                  <PremiumButton
+                    onClick={() => setShowDetails(false)}
+                    style={{ background: '#F8F9FA', color: '#1A1A1A' }}
+                  >
+                    닫기
+                  </PremiumButton>
+                </div>
               </div>
             </motion.div>
           </>
@@ -343,9 +349,6 @@ export default function Home() {
         .disclaimer { text-align: center; margin-top: 80px; opacity: 0.2; font-size: 10px; font-weight: 700; }
         .icon-wrapper { width: 24px; height: 24px; display: flex; justify-content: center; align-items: center; }
         
-        .detail-btn { background: #074CA1; color: white; padding: 12px 24px; border-radius: 12px; border: none; font-weight: 700; font-size: 14px; margin-top: 20px; cursor: pointer; transition: all 0.2s; }
-        .detail-btn:active { transform: scale(0.95); opacity: 0.9; }
-
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1000; }
         .bottom-sheet { position: fixed; bottom: 0; left: 0; right: 0; max-width: 430px; margin: 0 auto; background: white; border-radius: 32px 32px 0 0; z-index: 1001; padding: 12px 24px 40px; box-shadow: 0 -10px 40px rgba(0,0,0,0.15); touch-action: none; }
         .sheet-handle { width: 36px; height: 5px; background: #DDD; border-radius: 10px; margin: 0 auto 32px; cursor: grab; }
@@ -357,7 +360,6 @@ export default function Home() {
         .spec-label { color: #8E8E93; font-weight: 700; flex-shrink: 0; }
         .spec-value { color: #1A1A1A; font-weight: 800; text-align: right; word-break: break-all; }
         .font-download-link { color: #074CA1; font-weight: 800; text-decoration: underline; font-size: 14px; }
-        .close-btn { width: 100%; height: 56px; background: #074CA1; border: none; border-radius: 16px; color: white; font-weight: 800; margin-top: 32px; cursor: pointer; font-size: 15px; }
 
         .logo-wrapper { position: relative; overflow: hidden; }
         .glint-effect { position: absolute; top: -100%; left: -100%; width: 300%; height: 300%; background: linear-gradient(135deg, rgba(255, 255, 255, 0) 40%, rgba(255, 255, 255, 0.9) 50%, rgba(255, 255, 255, 0) 60%); transform: rotate(25deg); animation: moveGlint 1.2s infinite linear; pointer-events: none; }
