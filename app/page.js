@@ -49,24 +49,19 @@ export default function Home() {
     return () => { clearInterval(interval); clearInterval(clock); };
   }, [fetchScores]);
 
-  if (isLoading) {
-    return (
-      <div className="loading-screen">
-        <div className="logo-wrapper">
-          <Image src="/logo.svg" alt="라이온즈" width={120} height={100} priority />
-          <div className="glint-effect"></div>
-        </div>
-        <style jsx>{`
-          .loading-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #ffffff; display: flex; justify-content: center; align-items: center; z-index: 10000; }
-          .logo-wrapper { position: relative; overflow: hidden; }
-          .glint-effect { position: absolute; top: -100%; left: -100%; width: 300%; height: 300%; background: linear-gradient(135deg, rgba(255, 255, 255, 0) 40%, rgba(255, 255, 255, 0.9) 50%, rgba(255, 255, 255, 0) 60%); transform: rotate(25deg); animation: moveGlint 2s infinite ease-in-out; pointer-events: none; }
-          @keyframes moveGlint { 0% { transform: translateY(-20%) translateX(-20%) rotate(25deg); } 100% { transform: translateY(20%) translateX(20%) rotate(25deg); } }
-        `}</style>
-      </div>
-    );
-  }
-
   const renderContent = () => {
+    // 로딩 중일 때 모바일 레이아웃 내부에서 로딩 표시
+    if (isLoading) {
+      return (
+        <div className="scroll-area" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#FFFFFF' }}>
+          <div className="logo-wrapper">
+            <Image src="/logo.svg" alt="라이온즈" width={110} height={90} priority />
+            <div className="glint-effect"></div>
+          </div>
+        </div>
+      );
+    }
+
     switch (activeTab) {
       case 'home':
         return (
@@ -181,7 +176,7 @@ export default function Home() {
                 <Image src="/logo.svg" alt="Lions" fill style={{ objectFit: 'contain' }} />
               </div>
               <h2>라이언즈 팬 대시보드</h2>
-              <p>삼성 라이온즈 팬 프로젝트 v1.3.1</p>
+              <p>삼성 라이온즈 팬 프로젝트 v1.3.2</p>
             </div>
             <div className="disclaimer">
               <p>본 대시보드는 공개된 데이터를 사용하는 팬 메이드 프로젝트입니다.</p>
@@ -210,7 +205,11 @@ export default function Home() {
         ))}
       </nav>
 
+      {/* Vercel Toolbar 및 기타 외부 UI 강제 숨김 */}
       <style jsx global>{`
+        #vercel-live-feedback { display: none !important; }
+        .vercel-toolbar { display: none !important; }
+        
         .live-dot { width: 8px; height: 8px; background: #FF3B30; border-radius: 50%; box-shadow: 0 0 10px rgba(255, 59, 48, 0.6); animation: pulse 1.5s infinite; }
         .inactive-dot { width: 8px; height: 8px; background: #C0C0C0; border-radius: 50%; }
         .score-number { font-size: 64px; color: #074CA1; font-weight: 950; letter-spacing: -3px; line-height: 1; }
@@ -232,6 +231,11 @@ export default function Home() {
         .about-logo { position: relative; width: 120px; height: 90px; margin: 0 auto 28px; }
         .disclaimer { text-align: center; margin-top: 80px; opacity: 0.2; font-size: 10px; font-weight: 700; }
         .icon-wrapper { width: 24px; height: 24px; display: flex; justify-content: center; align-items: center; }
+        
+        /* 로딩 내부 스타일 */
+        .logo-wrapper { position: relative; overflow: hidden; }
+        .glint-effect { position: absolute; top: -100%; left: -100%; width: 300%; height: 300%; background: linear-gradient(135deg, rgba(255, 255, 255, 0) 40%, rgba(255, 255, 255, 0.9) 50%, rgba(255, 255, 255, 0) 60%); transform: rotate(25deg); animation: moveGlint 2s infinite ease-in-out; pointer-events: none; }
+        @keyframes moveGlint { 0% { transform: translateY(-20%) translateX(-20%) rotate(25deg); } 100% { transform: translateY(20%) translateX(20%) rotate(25deg); } }
         @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.4); } 100% { opacity: 1; transform: scale(1); } }
       `}</style>
     </div>
