@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import { HomeIcon, MatchIcon, RankIcon, MoreIcon } from '../components/Icons';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import PremiumButton from '../components/PremiumButton';
 
 export default function Home() {
@@ -14,6 +14,9 @@ export default function Home() {
   const [hasGame, setHasGame] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
+
+  // 물리 시뮬레이션 제어용
+  const controls = useAnimation();
 
   useEffect(() => {
     const handleContextMenu = (e) => e.preventDefault();
@@ -96,136 +99,107 @@ export default function Home() {
     }
 
     switch (activeTab) {
-      case 'home':
-        return (
-          <div className="scroll-area animate-fade">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', padding: '0 0 32px 0' }}>
-              <div style={{ position: 'relative', width: '130px', height: '44px' }}>
-                <Image src="/logo.svg" alt="최강삼성! 라이온즈" title="최강삼성! 라이온즈" fill style={{ objectFit: 'contain', objectPosition: 'left' }} />
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: '11px', fontWeight: '900', color: '#074CA1', letterSpacing: '1px', marginBottom: '2px' }}>최강삼성 승리하리라</div>
-                <div style={{ fontSize: '13px', fontWeight: '600', color: '#8E8E93', tabularNums: true }}>{matchTime}</div>
-              </div>
+      case 'home': return (
+        <div className="scroll-area animate-fade">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', padding: '0 0 32px 0' }}>
+            <div style={{ position: 'relative', width: '130px', height: '44px' }}>
+              <Image src="/logo.svg" alt="최강삼성! 라이온즈" title="최강삼성! 라이온즈" fill style={{ objectFit: 'contain', objectPosition: 'left' }} />
             </div>
-
-            {hasGame && scoreData ? (
-              <div className={`premium-card ${isRefreshing ? 'refreshing' : ''}`}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span className={scoreData.isLive ? "live-dot" : "inactive-dot"}></span>
-                    <span style={{ fontSize: '14px', fontWeight: '950', color: scoreData.isLive ? '#FF3B30' : '#1A1A1A' }}>
-                      {scoreData.isLive ? '라이브 중계' : '최근 경기'}
-                    </span>
-                  </div>
-                  <div style={{ fontSize: '11px', fontWeight: '800', color: '#BBB' }}>KBO 공식 데이터</div>
-                </div>
-
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ textAlign: 'center', flex: 1 }}>
-                    <div style={{ position: 'relative', width: '36px', height: '28px', margin: '0 auto 12px' }}>
-                      <Image src="/logo.svg" alt="최강삼성! 라이온즈" title="최강삼성! 라이온즈" fill style={{ objectFit: 'contain' }} />
-                    </div>
-                    <div className="score-number">{scoreData.homeScore ?? 0}</div>
-                  </div>
-                  <div style={{ fontSize: '20px', fontWeight: '100', color: '#DDD', padding: '0 10px' }}>:</div>
-                  <div style={{ textAlign: 'center', flex: 1 }}>
-                    <div style={{ fontSize: '15px', fontWeight: '950', color: '#333', marginBottom: '15px' }}>{scoreData.away}</div>
-                    <div className="score-number dark">{scoreData.awayScore ?? 0}</div>
-                  </div>
-                </div>
-
-                <div className="card-footer-info">
-                  <p>{scoreData.status} {scoreData.inning && `| ${scoreData.inning}`}</p>
-                  <p className="sync-info">실시간 매치 데이터 동기화 중 (30초 간격)</p>
-                </div>
-              </div>
-            ) : (
-              <div className="premium-card empty-state">
-                <div style={{ position: 'relative', width: '40px', height: '40px', margin: '0 auto 20px', opacity: 0.1 }}>
-                  <Image src="/logo.svg" alt="최강삼성! 라이온즈" title="최강삼성! 라이온즈" fill style={{ objectFit: 'contain' }} />
-                </div>
-                <h2 style={{ fontSize: '18px', margin: 0, fontWeight: '900', color: '#1A1A1A' }}>오늘은 예정된 경기가 없습니다</h2>
-                <p style={{ fontSize: '13px', color: '#999', marginTop: '10px' }}>팬 여러분, 내일 경기를 준비해 주세요!</p>
-              </div>
-            )}
-
-            <div className="premium-card">
-              <h2 className="section-title">라이온즈 최신 소식</h2>
-              <div className="simple-list">
-                <div className="list-item">라이온즈 파크 주말 경기 입장권 매진</div>
-                <div className="list-item">선수단 컨디션 점검 및 훈련 리포트 발간</div>
-              </div>
-            </div>
-
-            <div style={{ marginTop: '10px' }}>
-              <PremiumButton onClick={fetchScores}>
-                {isRefreshing ? '데이터 동기화 중...' : '데이터 수동 새로고침'}
-              </PremiumButton>
-            </div>
-            <div style={{ height: '30px' }}></div>
-          </div>
-        );
-      case 'match':
-        return (
-          <div className="scroll-area animate-fade">
-            <h1 className="page-title">경기 일정</h1>
-            {[
-              { date: '2026.06.04', vs: 'LG 트윈스', place: '대구 라이온즈 파크' },
-              { date: '2026.06.05', vs: 'SSG 랜더스', place: '인천 SSG 랜더스 필드' }
-            ].map((m, i) => (
-              <div key={i} className="premium-card schedule-row">
-                <div className="date-tag">{m.date}</div>
-                <div className="game-info">
-                  <h2>{m.vs}</h2>
-                  <p>{m.place}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        );
-      case 'rank':
-        return (
-          <div className="scroll-area animate-fade">
-            <h1 className="page-title">리그 순위</h1>
-            <div className="premium-card table-wrapper">
-              <table>
-                <thead>
-                  <tr><th>순위</th><th>팀 명</th><th style={{ textAlign: 'right' }}>승률</th></tr>
-                </thead>
-                <tbody>
-                  <tr className="highlight-row">
-                    <td>1</td><td>삼성 라이온즈</td><td style={{ textAlign: 'right' }}>0.658</td>
-                  </tr>
-                </tbody>
-              </table>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: '11px', fontWeight: '900', color: '#074CA1', letterSpacing: '1px', marginBottom: '2px' }}>최강삼성 승리하리라</div>
+              <div style={{ fontSize: '13px', fontWeight: '600', color: '#8E8E93', tabularNums: true }}>{matchTime}</div>
             </div>
           </div>
-        );
-      case 'more':
-        return (
-          <div className="scroll-area animate-fade">
-            <h1 className="page-title">정보 및 설정</h1>
-            <div className="premium-card about-card">
-              <div className="about-logo">
+          {hasGame && scoreData ? (
+            <div className={`premium-card ${isRefreshing ? 'refreshing' : ''}`}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span className={scoreData.isLive ? "live-dot" : "inactive-dot"}></span>
+                  <span style={{ fontSize: '14px', fontWeight: '950', color: scoreData.isLive ? '#FF3B30' : '#1A1A1A' }}>{scoreData.isLive ? '라이브 중계' : '최근 경기'}</span>
+                </div>
+                <div style={{ fontSize: '11px', fontWeight: '800', color: '#BBB' }}>KBO 공식 데이터</div>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ textAlign: 'center', flex: 1 }}>
+                  <div style={{ position: 'relative', width: '36px', height: '28px', margin: '0 auto 12px' }}>
+                    <Image src="/logo.svg" alt="최강삼성! 라이온즈" title="최강삼성! 라이온즈" fill style={{ objectFit: 'contain' }} />
+                  </div>
+                  <div className="score-number">{scoreData.homeScore ?? 0}</div>
+                </div>
+                <div style={{ fontSize: '20px', fontWeight: '100', color: '#DDD', padding: '0 10px' }}>:</div>
+                <div style={{ textAlign: 'center', flex: 1 }}>
+                  <div style={{ fontSize: '15px', fontWeight: '950', color: '#333', marginBottom: '15px' }}>{scoreData.away}</div>
+                  <div className="score-number dark">{scoreData.awayScore ?? 0}</div>
+                </div>
+              </div>
+              <div className="card-footer-info">
+                <p>{scoreData.status} {scoreData.inning && `| ${scoreData.inning}`}</p>
+                <p className="sync-info">실시간 매치 데이터 동기화 중 (30초 간격)</p>
+              </div>
+            </div>
+          ) : (
+            <div className="premium-card empty-state">
+              <div style={{ position: 'relative', width: '40px', height: '40px', margin: '0 auto 20px', opacity: 0.1 }}>
                 <Image src="/logo.svg" alt="최강삼성! 라이온즈" title="최강삼성! 라이온즈" fill style={{ objectFit: 'contain' }} />
               </div>
-              <h2>라이언즈 팬 대시보드</h2>
-              <p>Lion Spirits Fan Project v1.4.1</p>
-
-              <div style={{ marginTop: '20px' }}>
-                <PremiumButton onClick={() => setShowDetails(true)}>
-                  기술 스택 자세히 보기
-                </PremiumButton>
-              </div>
+              <h2 style={{ fontSize: '18px', margin: 0, fontWeight: '900', color: '#1A1A1A' }}>오늘은 예정된 경기가 없습니다</h2>
+              <p style={{ fontSize: '13px', color: '#999', marginTop: '10px' }}>팬 여러분, 내일 경기를 준비해 주세요!</p>
             </div>
-
-            <div className="disclaimer">
-              <p>본 대시보드는 공개된 데이터를 사용하는 팬 메이드 프로젝트입니다.</p>
-              <p>© 2026 최강삼성 팬 프로젝트</p>
+          )}
+          <div className="premium-card">
+            <h2 className="section-title">라이온즈 최신 소식</h2>
+            <div className="simple-list">
+              <div className="list-item">라이온즈 파크 주말 경기 입장권 매진</div>
+              <div className="list-item">선수단 컨디션 점검 및 훈련 리포트 발간</div>
             </div>
           </div>
-        );
+          <div style={{ marginTop: '10px' }}>
+            <PremiumButton onClick={fetchScores}>
+              {isRefreshing ? '데이터 동기화 중...' : '데이터 수동 새로고침'}
+            </PremiumButton>
+          </div>
+          <div style={{ height: '30px' }}></div>
+        </div>
+      );
+      case 'match': return (
+        <div className="scroll-area animate-fade">
+          <h1 className="page-title">경기 일정</h1>
+          {[
+            { date: '2026.06.04', vs: 'LG 트윈스', place: '대구 라이온즈 파크' },
+            { date: '2026.06.05', vs: 'SSG 랜더스', place: '인천 SSG 랜더스 필드' }
+          ].map((m, i) => (
+            <div key={i} className="premium-card schedule-row">
+              <div className="date-tag">{m.date}</div>
+              <div className="game-info"><h2>{m.vs}</h2><p>{m.place}</p></div>
+            </div>
+          ))}
+        </div>
+      );
+      case 'rank': return (
+        <div className="scroll-area animate-fade">
+          <h1 className="page-title">리그 순위</h1>
+          <div className="premium-card table-wrapper">
+            <table>
+              <thead><tr><th>순위</th><th>팀 명</th><th style={{ textAlign: 'right' }}>승률</th></tr></thead>
+              <tbody><tr className="highlight-row"><td>1</td><td>삼성 라이온즈</td><td style={{ textAlign: 'right' }}>0.658</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      );
+      case 'more': return (
+        <div className="scroll-area animate-fade">
+          <h1 className="page-title">정보 및 설정</h1>
+          <div className="premium-card about-card">
+            <div className="about-logo"><Image src="/logo.svg" alt="최강삼성! 라이온즈" title="최강삼성! 라이온즈" fill style={{ objectFit: 'contain' }} /></div>
+            <h2>라이언즈 팬 대시보드</h2>
+            <p>Lion Spirits Fan Project v1.4.2</p>
+            <div style={{ marginTop: '20px' }}>
+              <PremiumButton onClick={() => setShowDetails(true)}>기술 스택 자세히 보기</PremiumButton>
+            </div>
+          </div>
+          <div className="disclaimer"><p>본 대시보드는 공개된 데이터를 사용하는 팬 메이드 프로젝트입니다.</p><p>© 2026 최강삼성 팬 프로젝트</p></div>
+        </div>
+      );
       default: return null;
     }
   };
@@ -233,100 +207,73 @@ export default function Home() {
   return (
     <div className="app-container">
       {renderContent()}
-
       <nav className="bottom-nav">
-        {[
-          { id: 'home', icon: <HomeIcon />, label: '홈' },
-          { id: 'match', icon: <MatchIcon />, label: '일정' },
-          { id: 'rank', icon: <RankIcon />, label: '순위' },
-          { id: 'more', icon: <MoreIcon />, label: '정보' }
-        ].map((tab) => (
+        {[{ id: 'home', icon: <HomeIcon />, label: '홈' }, { id: 'match', icon: <MatchIcon />, label: '일정' }, { id: 'rank', icon: <RankIcon />, label: '순위' }, { id: 'more', icon: <MoreIcon />, label: '정보' }].map((tab) => (
           <div key={tab.id} className={`nav-item ${activeTab === tab.id ? 'active' : ''}`} onClick={() => setActiveTab(tab.id)}>
-            <div className="icon-wrapper">{tab.icon}</div>
-            <span>{tab.label}</span>
+            <div className="icon-wrapper">{tab.icon}</div><span>{tab.label}</span>
           </div>
         ))}
       </nav>
 
+      {/* 물리 시뮬레이션 및 하단 확장 기반의 바텀 시트 */}
       <AnimatePresence>
         {showDetails && (
           <>
-            <motion.div
-              className="modal-overlay"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setShowDetails(false)}
-            />
+            <motion.div className="modal-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowDetails(false)} />
             <motion.div
               className="bottom-sheet"
               initial={{ y: "100%" }}
-              animate={{ y: "20%" }}
+              animate={{ y: "30%" }} /* 기본 노출 위치 (쫀득하게 시작) */
               exit={{ y: "100%" }}
               drag="y"
-              /* 한도 제한: 화면 위를 넘지 않도록 top 값을 -100 정도로 제한 */
-              dragConstraints={{ top: -120, bottom: 0 }}
-              dragElastic={0.08}
+              /* 
+                상단 한도(-150)와 하단 닫기 한도 제어.
+                dragConstraints는 애니메이션 위치 기준입니다. 
+                y: "30%"인 상태에서 top: -150은 화면 상단으로부터 적절한 거리를 유지하게 합니다.
+              */
+              dragConstraints={{ top: -150, bottom: 50 }}
+              dragElastic={0.1}
               onDragEnd={(e, info) => {
-                if (info.offset.y > 100) setShowDetails(false);
+                // 속도가 빠르거나 하단으로 많이 내려가면 닫기
+                if (info.offset.y > 150 || info.velocity.y > 500) {
+                  setShowDetails(false);
+                }
               }}
-              transition={{ type: "spring", damping: 25, stiffness: 200, mass: 0.8 }}
+              transition={{ type: "spring", damping: 30, stiffness: 220, mass: 1 }}
+              style={{
+                /* 하단이 절대 뚫리지 않도록 시트 자체를 매우 길게 구성 */
+                height: '180vh',
+                position: 'fixed',
+                bottom: 0,
+                zIndex: 1001,
+                background: 'white',
+              }}
             >
+              /* 핸들 및 상단 내용 */
               <div className="sheet-handle" />
-              <div className="sheet-content">
+              <div className="sheet-content" style={{ paddingBottom: '100px' }}>
                 <h3 className="sheet-title">Software Specifications</h3>
-
                 <div className="spec-list">
-                  <div className="spec-row">
-                    <span className="spec-label">Core Engine</span>
-                    <span className="spec-value">Next.js v16.2.7</span>
-                  </div>
-                  <div className="spec-row">
-                    <span className="spec-label">Base Font</span>
-                    <span className="spec-value">에이투지체 (A2z)</span>
-                  </div>
-                  <div className="spec-row">
-                    <span className="spec-label">Interaction</span>
-                    <span className="spec-value">Framer Motion v11</span>
-                  </div>
-                  <div className="spec-row">
-                    <span className="spec-label">Deployment</span>
-                    <span className="spec-value">Vercel Edge</span>
-                  </div>
-                  <div className="spec-row">
-                    <span className="spec-label">Developer</span>
-                    <span className="spec-value">Rhee Hose (이호세)</span>
-                  </div>
+                  <div className="spec-row"><span className="spec-label">Core Engine</span><span className="spec-value">Next.js v16.2.7</span></div>
+                  <div className="spec-row"><span className="spec-label">Base Font</span><span className="spec-value">에이투지체 (A2z)</span></div>
+                  <div className="spec-row"><span className="spec-label">Interaction</span><span className="spec-value">Framer Motion v11</span></div>
+                  <div className="spec-row"><span className="spec-label">Deployment</span><span className="spec-value">Vercel Edge</span></div>
+                  <div className="spec-row"><span className="spec-label">Developer</span><span className="spec-value">Rhee Hose (이호세)</span></div>
                 </div>
-
                 <div style={{ marginTop: '32px', textAlign: 'center' }}>
-                  <a
-                    href="https://noonnu.cc/font_page/1778"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-download-link no-underline-link"
-                  >
-                    에이투지체 공식 다운로드
-                  </a>
+                  <a href="https://noonnu.cc/font_page/1778" target="_blank" rel="noopener noreferrer" className="no-underline-link">에이투지체 공식 다운로드</a>
                 </div>
-
                 <div style={{ marginTop: '32px' }}>
-                  <PremiumButton onClick={() => setShowDetails(false)}>
-                    닫기
-                  </PremiumButton>
+                  <PremiumButton onClick={() => setShowDetails(false)}>닫기</PremiumButton>
                 </div>
               </div>
-              {/* 아래쪽 끊김 방지를 위한 무한 배경 확장 (더 길게!) */}
-              <div className="sheet-extended-bg-v2" />
             </motion.div>
           </>
         )}
       </AnimatePresence>
 
       <style jsx global>{`
-        #vercel-live-feedback { display: none !important; }
-        .vercel-toolbar { display: none !important; }
-        
+        #vercel-live-feedback, .vercel-toolbar { display: none !important; }
         .live-dot { width: 8px; height: 8px; background: #FF3B30; border-radius: 50%; box-shadow: 0 0 10px rgba(255, 59, 48, 0.6); animation: pulse 1.5s infinite; }
         .inactive-dot { width: 8px; height: 8px; background: #C0C0C0; border-radius: 50%; }
         .score-number { font-size: 64px; color: #074CA1; font-weight: 950; letter-spacing: -3px; line-height: 1; }
@@ -338,7 +285,6 @@ export default function Home() {
         .empty-state { padding: 80px 24px; text-align: center; }
         .section-title { font-size: 16px; margin-bottom: 20px; font-weight: 900; color: #1A1A1A; letter-spacing: 0.5px; }
         .list-item { padding: 18px; background: #F8F9FA; border-radius: 20px; color: #1A1A1A; font-weight: 700; font-size: 14px; margin-bottom: 12px; transition: all 0.2s; }
-        .list-item:active { transform: scale(0.98); background: #F0F2F5; }
         .page-title { font-size: 26px; font-weight: 900; color: #074CA1; margin-bottom: 32px; letter-spacing: -0.5px; }
         .date-tag { font-size: 12px; color: #074CA1; font-weight: 950; margin-bottom: 6px; }
         .table-wrapper table { width: 100%; border-collapse: collapse; }
@@ -347,32 +293,19 @@ export default function Home() {
         .about-card { padding: 60px 24px; text-align: center; }
         .about-logo { position: relative; width: 120px; height: 90px; margin: 0 auto 28px; }
         .disclaimer { text-align: center; margin-top: 80px; opacity: 0.2; font-size: 10px; font-weight: 700; }
-        .icon-wrapper { width: 24px; height: 24px; display: flex; justify-content: center; align-items: center; }
-        
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1000; }
-        
         .bottom-sheet { 
-          position: fixed; bottom: 0; left: 0; right: 0; max-width: 430px; margin: 0 auto; 
-          background: white; border-radius: 32px 32px 0 0; z-index: 1001; 
-          padding: 12px 24px 60px; box-shadow: 0 -10px 40px rgba(0,0,0,0.15); 
-          touch-action: none; overflow: hidden;
+          border-radius: 32px 32px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,0.15); 
+          touch-action: none; overflow: hidden; /* 내부 스크롤바 제거 */
         }
-        .sheet-extended-bg-v2 { 
-          position: absolute; top: 100%; left: -10px; right: -10px; height: 300vh; background: white; 
-        }
-        
-        .sheet-handle { width: 36px; height: 5px; background: #DDD; border-radius: 10px; margin: 0 auto 32px; cursor: grab; }
-        .sheet-title { font-size: 18px; font-weight: 900; color: #074CA1; margin-bottom: 28px; text-align: center; letter-spacing: -0.5px; }
+        .sheet-handle { width: 36px; height: 5px; background: #DDD; border-radius: 10px; margin: 12px auto 32px; cursor: grab; }
+        .sheet-title { font-size: 18px; font-weight: 900; color: #074CA1; margin-bottom: 28px; text-align: center; }
         .spec-list { background: #F8F9FA; border-radius: 20px; padding: 8px 20px; }
         .spec-row { display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid #EEE; font-size: 14px; gap: 40px; }
         .spec-row:last-child { border-bottom: none; }
         .spec-label { color: #8E8E93; font-weight: 700; flex-shrink: 0; }
         .spec-value { color: #1A1A1A; font-weight: 800; text-align: right; word-break: break-all; }
         .no-underline-link { text-decoration: none !important; color: #074CA1; font-weight: 800; }
-
-        .logo-wrapper { position: relative; overflow: hidden; }
-        .glint-effect { position: absolute; top: -100%; left: -100%; width: 300%; height: 300%; background: linear-gradient(135deg, rgba(255, 255, 255, 0) 40%, rgba(255, 255, 255, 0.9) 50%, rgba(255, 255, 255, 0) 60%); transform: rotate(25deg); animation: moveGlint 1.2s infinite linear; pointer-events: none; }
-        @keyframes moveGlint { 0% { transform: translateY(-25%) translateX(-25%) rotate(25deg); } 100% { transform: translateY(25%) translateX(25%) rotate(25deg); } }
         @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.4); } 100% { opacity: 1; transform: scale(1); } }
       `}</style>
     </div>
