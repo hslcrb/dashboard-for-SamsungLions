@@ -114,7 +114,9 @@ export default function Home() {
               </div>
             ) : (
               <div className="premium-card empty-state">
-                <div style={{ fontSize: '32px', marginBottom: '16px' }}>🦁</div>
+                <div style={{ position: 'relative', width: '40px', height: '40px', margin: '0 auto 20px', opacity: 0.1 }}>
+                  <Image src="/logo.svg" alt="Lions Logo" fill style={{ objectFit: 'contain' }} />
+                </div>
                 <h2 style={{ fontSize: '18px', margin: 0, fontWeight: '900', color: '#1A1A1A' }}>오늘은 예정된 경기가 없습니다</h2>
                 <p style={{ fontSize: '13px', color: '#999', marginTop: '10px' }}>팬 여러분, 내일 경기를 준비해 주세요!</p>
               </div>
@@ -179,7 +181,7 @@ export default function Home() {
                 <Image src="/logo.svg" alt="Lions" fill style={{ objectFit: 'contain' }} />
               </div>
               <h2>팬 대시보드</h2>
-              <p>삼성 라이온즈 팬 프로젝트 v1.2.9</p>
+              <p>삼성 라이온즈 팬 프로젝트 v1.3.0</p>
             </div>
             <div className="disclaimer">
               <p>본 대시보드는 공개된 데이터를 사용하는 팬 메이드 프로젝트입니다.</p>
