@@ -53,7 +53,7 @@ export default function Home() {
     return (
       <div className="loading-screen">
         <div className="logo-wrapper">
-          <Image src="/logo.svg" alt="Lions" width={120} height={100} priority />
+          <Image src="/logo.svg" alt="라이온즈" width={120} height={100} priority />
           <div className="glint-effect"></div>
         </div>
         <style jsx>{`
@@ -73,10 +73,10 @@ export default function Home() {
           <div className="scroll-area animate-fade">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', padding: '0 0 32px 0' }}>
               <div style={{ position: 'relative', width: '130px', height: '44px' }}>
-                <Image src="/logo.svg" alt="Samsung Lions" fill style={{ objectFit: 'contain', objectPosition: 'left' }} />
+                <Image src="/logo.svg" alt="삼성 라이온즈" fill style={{ objectFit: 'contain', objectPosition: 'left' }} />
               </div>
               <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: '11px', fontWeight: '900', color: '#074CA1', letterSpacing: '1px', marginBottom: '2px' }}>WIN FOR LIONS</div>
+                <div style={{ fontSize: '11px', fontWeight: '900', color: '#074CA1', letterSpacing: '1px', marginBottom: '2px' }}>최강삼성 승리하리라</div>
                 <div style={{ fontSize: '13px', fontWeight: '600', color: '#8E8E93', tabularNums: true }}>{matchTime}</div>
               </div>
             </div>
@@ -87,10 +87,10 @@ export default function Home() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span className={scoreData.isLive ? "live-dot" : "inactive-dot"}></span>
                     <span style={{ fontSize: '14px', fontWeight: '950', color: scoreData.isLive ? '#FF3B30' : '#1A1A1A' }}>
-                      {scoreData.isLive ? 'LIVE NOW' : 'RECENT GAME'}
+                      {scoreData.isLive ? '라이브 중계' : '최근 경기'}
                     </span>
                   </div>
-                  <div style={{ fontSize: '11px', fontWeight: '800', color: '#BBB' }}>KBO DATA</div>
+                  <div style={{ fontSize: '11px', fontWeight: '800', color: '#BBB' }}>KBO 공식 데이터</div>
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -109,27 +109,27 @@ export default function Home() {
 
                 <div className="card-footer-info">
                   <p>{scoreData.status} {scoreData.inning && `| ${scoreData.inning}`}</p>
-                  <p className="sync-info">실시간 매치 동기화 중 (30s interval)</p>
+                  <p className="sync-info">실시간 매치 데이터 동기화 중 (30초 간격)</p>
                 </div>
               </div>
             ) : (
               <div className="premium-card empty-state">
                 <div style={{ fontSize: '32px', marginBottom: '16px' }}>🦁</div>
-                <h2 style={{ fontSize: '18px', margin: 0, fontWeight: '900', color: '#1A1A1A' }}>오늘은 경기가 없습니다</h2>
+                <h2 style={{ fontSize: '18px', margin: 0, fontWeight: '900', color: '#1A1A1A' }}>오늘은 예정된 경기가 없습니다</h2>
                 <p style={{ fontSize: '13px', color: '#999', marginTop: '10px' }}>팬 여러분, 내일 경기를 준비해 주세요!</p>
               </div>
             )}
 
             <div className="premium-card">
-              <h2 className="section-title">LIONS NEWS</h2>
+              <h2 className="section-title">라이온즈 최신 소식</h2>
               <div className="simple-list">
-                <div className="list-item">라이온즈 파크 주말 경기 매진 안내</div>
-                <div className="list-item">팀 투수진 평균 자책점 리그 상위권 유지</div>
+                <div className="list-item">라이온즈 파크 주말 경기 입장권 매진</div>
+                <div className="list-item">선수단 컨디션 점검 및 훈련 리포트 발간</div>
               </div>
             </div>
 
             <button className="action-button" style={{ marginTop: '10px' }} onClick={fetchScores}>
-              {isRefreshing ? 'REFRESHING...' : 'FORCE REFRESH'}
+              {isRefreshing ? '데이터 동기화 중...' : '데이터 수동 새로고침'}
             </button>
             <div style={{ height: '30px' }}></div>
           </div>
@@ -137,10 +137,10 @@ export default function Home() {
       case 'match':
         return (
           <div className="scroll-area animate-fade">
-            <h1 className="page-title">SCHEDULE</h1>
+            <h1 className="page-title">경기 일정</h1>
             {[
-              { date: '2026.06.04', vs: 'LG 트윈스', place: '대구 Lions Park' },
-              { date: '2026.06.05', vs: 'SSG 랜더스', place: '인천 SSG Landers Field' }
+              { date: '2026.06.04', vs: 'LG 트윈스', place: '대구 라이온즈 파크' },
+              { date: '2026.06.05', vs: 'SSG 랜더스', place: '인천 SSG 랜더스 필드' }
             ].map((m, i) => (
               <div key={i} className="premium-card schedule-row">
                 <div className="date-tag">{m.date}</div>
@@ -155,15 +155,15 @@ export default function Home() {
       case 'rank':
         return (
           <div className="scroll-area animate-fade">
-            <h1 className="page-title">STANDINGS</h1>
+            <h1 className="page-title">리그 순위</h1>
             <div className="premium-card table-wrapper">
               <table>
                 <thead>
-                  <tr><th>RANK</th><th>TEAM</th><th style={{ textAlign: 'right' }}>PCT</th></tr>
+                  <tr><th>순위</th><th>팀 명</th><th style={{ textAlign: 'right' }}>승률</th></tr>
                 </thead>
                 <tbody>
                   <tr className="highlight-row">
-                    <td>1</td><td>SAMSUNG LIONS</td><td style={{ textAlign: 'right' }}>0.658</td>
+                    <td>1</td><td>삼성 라이온즈</td><td style={{ textAlign: 'right' }}>0.658</td>
                   </tr>
                 </tbody>
               </table>
@@ -173,17 +173,17 @@ export default function Home() {
       case 'more':
         return (
           <div className="scroll-area animate-fade">
-            <h1 className="page-title">ABOUT</h1>
+            <h1 className="page-title">정보 및 설정</h1>
             <div className="premium-card about-card">
               <div className="about-logo">
                 <Image src="/logo.svg" alt="Lions" fill style={{ objectFit: 'contain' }} />
               </div>
-              <h2>FAN DASHBOARD</h2>
-              <p>Lion Spirits Fan Project v1.2.9</p>
+              <h2>팬 대시보드</h2>
+              <p>삼성 라이온즈 팬 프로젝트 v1.2.9</p>
             </div>
             <div className="disclaimer">
-              <p>This is a fan-made dashboard using public data.</p>
-              <p>© 2026 FOR THE LIONS</p>
+              <p>본 대시보드는 공개된 데이터를 사용하는 팬 메이드 프로젝트입니다.</p>
+              <p>© 2026 최강삼성 팬 프로젝트</p>
             </div>
           </div>
         );
@@ -196,10 +196,10 @@ export default function Home() {
       {renderContent()}
       <nav className="bottom-nav">
         {[
-          { id: 'home', icon: <HomeIcon />, label: 'HOME' },
-          { id: 'match', icon: <MatchIcon />, label: 'MATCH' },
-          { id: 'rank', icon: <RankIcon />, label: 'RANK' },
-          { id: 'more', icon: <MoreIcon />, label: 'INFO' }
+          { id: 'home', icon: <HomeIcon />, label: '홈' },
+          { id: 'match', icon: <MatchIcon />, label: '일정' },
+          { id: 'rank', icon: <RankIcon />, label: '순위' },
+          { id: 'more', icon: <MoreIcon />, label: '정보' }
         ].map((tab) => (
           <div key={tab.id} className={`nav-item ${activeTab === tab.id ? 'active' : ''}`} onClick={() => setActiveTab(tab.id)}>
             <div className="icon-wrapper">{tab.icon}</div>
