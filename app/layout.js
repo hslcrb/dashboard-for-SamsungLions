@@ -1,8 +1,8 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "SAMSUNG LIONS OFFICIAL",
-  description: "삼성 라이온즈 공식 팬 대시보드",
+  title: "SAMSUNG LIONS FAN DASHBOARD",
+  description: "삼성 라이온즈 팬들을 위한 실시간 데이터 대시보드",
   viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0",
   icons: {
     icon: "/logo.svg",
