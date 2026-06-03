@@ -50,12 +50,11 @@ export default function Home() {
   }, [fetchScores]);
 
   const renderContent = () => {
-    // 로딩 중일 때 모바일 레이아웃 내부에서 로딩 표시
     if (isLoading) {
       return (
         <div className="scroll-area" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#FFFFFF' }}>
           <div className="logo-wrapper">
-            <Image src="/logo.svg" alt="라이온즈" width={110} height={90} priority />
+            <Image src="/logo.svg" alt="최강삼성! 라이온즈" title="최강삼성! 라이온즈" width={110} height={90} priority />
             <div className="glint-effect"></div>
           </div>
         </div>
@@ -68,7 +67,7 @@ export default function Home() {
           <div className="scroll-area animate-fade">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', padding: '0 0 32px 0' }}>
               <div style={{ position: 'relative', width: '130px', height: '44px' }}>
-                <Image src="/logo.svg" alt="삼성 라이온즈" fill style={{ objectFit: 'contain', objectPosition: 'left' }} />
+                <Image src="/logo.svg" alt="최강삼성! 라이온즈" title="최강삼성! 라이온즈" fill style={{ objectFit: 'contain', objectPosition: 'left' }} />
               </div>
               <div style={{ textAlign: 'right' }}>
                 <div style={{ fontSize: '11px', fontWeight: '900', color: '#074CA1', letterSpacing: '1px', marginBottom: '2px' }}>최강삼성 승리하리라</div>
@@ -91,7 +90,7 @@ export default function Home() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ textAlign: 'center', flex: 1 }}>
                     <div style={{ position: 'relative', width: '36px', height: '28px', margin: '0 auto 12px' }}>
-                      <Image src="/logo.svg" alt="L" fill style={{ objectFit: 'contain' }} />
+                      <Image src="/logo.svg" alt="최강삼성! 라이온즈" title="최강삼성! 라이온즈" fill style={{ objectFit: 'contain' }} />
                     </div>
                     <div className="score-number">{scoreData.homeScore ?? 0}</div>
                   </div>
@@ -110,7 +109,7 @@ export default function Home() {
             ) : (
               <div className="premium-card empty-state">
                 <div style={{ position: 'relative', width: '40px', height: '40px', margin: '0 auto 20px', opacity: 0.1 }}>
-                  <Image src="/logo.svg" alt="Lions Logo" fill style={{ objectFit: 'contain' }} />
+                  <Image src="/logo.svg" alt="최강삼성! 라이온즈" title="최강삼성! 라이온즈" fill style={{ objectFit: 'contain' }} />
                 </div>
                 <h2 style={{ fontSize: '18px', margin: 0, fontWeight: '900', color: '#1A1A1A' }}>오늘은 예정된 경기가 없습니다</h2>
                 <p style={{ fontSize: '13px', color: '#999', marginTop: '10px' }}>팬 여러분, 내일 경기를 준비해 주세요!</p>
@@ -173,10 +172,10 @@ export default function Home() {
             <h1 className="page-title">정보 및 설정</h1>
             <div className="premium-card about-card">
               <div className="about-logo">
-                <Image src="/logo.svg" alt="Lions" fill style={{ objectFit: 'contain' }} />
+                <Image src="/logo.svg" alt="최강삼성! 라이온즈" title="최강삼성! 라이온즈" fill style={{ objectFit: 'contain' }} />
               </div>
               <h2>라이언즈 팬 대시보드</h2>
-              <p>삼성 라이온즈 팬 프로젝트 v1.3.2</p>
+              <p>삼성 라이온즈 팬 프로젝트 v1.3.3</p>
             </div>
             <div className="disclaimer">
               <p>본 대시보드는 공개된 데이터를 사용하는 팬 메이드 프로젝트입니다.</p>
@@ -205,7 +204,6 @@ export default function Home() {
         ))}
       </nav>
 
-      {/* Vercel Toolbar 및 기타 외부 UI 강제 숨김 */}
       <style jsx global>{`
         #vercel-live-feedback { display: none !important; }
         .vercel-toolbar { display: none !important; }
@@ -232,7 +230,6 @@ export default function Home() {
         .disclaimer { text-align: center; margin-top: 80px; opacity: 0.2; font-size: 10px; font-weight: 700; }
         .icon-wrapper { width: 24px; height: 24px; display: flex; justify-content: center; align-items: center; }
         
-        /* 로딩 내부 스타일 */
         .logo-wrapper { position: relative; overflow: hidden; }
         .glint-effect { position: absolute; top: -100%; left: -100%; width: 300%; height: 300%; background: linear-gradient(135deg, rgba(255, 255, 255, 0) 40%, rgba(255, 255, 255, 0.9) 50%, rgba(255, 255, 255, 0) 60%); transform: rotate(25deg); animation: moveGlint 2s infinite ease-in-out; pointer-events: none; }
         @keyframes moveGlint { 0% { transform: translateY(-20%) translateX(-20%) rotate(25deg); } 100% { transform: translateY(20%) translateX(20%) rotate(25deg); } }
