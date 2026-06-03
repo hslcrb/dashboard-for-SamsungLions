@@ -180,8 +180,8 @@ export default function Home() {
               <div className="about-logo">
                 <Image src="/logo.svg" alt="Lions" fill style={{ objectFit: 'contain' }} />
               </div>
-              <h2>팬 대시보드</h2>
-              <p>삼성 라이온즈 팬 프로젝트 v1.3.0</p>
+              <h2>라이언즈 팬 대시보드</h2>
+              <p>삼성 라이온즈 팬 프로젝트 v1.3.1</p>
             </div>
             <div className="disclaimer">
               <p>본 대시보드는 공개된 데이터를 사용하는 팬 메이드 프로젝트입니다.</p>
