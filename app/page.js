@@ -15,7 +15,42 @@ export default function Home() {
   useEffect(() => {
     const handleContextMenu = (e) => e.preventDefault();
     document.addEventListener('contextmenu', handleContextMenu);
-    return () => document.removeEventListener('contextmenu', handleContextMenu);
+
+    // 개발자 도구 방지 및 안내 메시지
+    const githubUrl = "https://github.com/hslcrb/dashboard-for-SamsungLions";
+    const msg = `본 프로젝트는 오픈 소스로 공개되어 있습니다. 소스 코드는 아래 주소에서 확인해 주세요:\n${githubUrl}`;
+
+    let devtoolsOpen = false;
+    const threshold = 160;
+
+    const checkDevTools = () => {
+      const widthDiff = window.outerWidth - window.innerWidth > threshold;
+      const heightDiff = window.outerHeight - window.innerHeight > threshold;
+
+      if ((widthDiff || heightDiff) && !devtoolsOpen) {
+        devtoolsOpen = true;
+        console.clear();
+        console.log(`%c${msg}`, "color: #074CA1; font-size: 14px; font-weight: bold; padding: 10px;");
+        alert(msg);
+        // 디버거 작동
+        (function () {
+          (function a() {
+            debugger;
+            setTimeout(a, 100);
+          })();
+        })();
+      }
+    };
+
+    window.addEventListener('resize', checkDevTools);
+
+    // 초기 콘솔 메시지
+    console.log(`%cLion Spirits: ${githubUrl}`, "color: #074CA1; font-weight: bold;");
+
+    return () => {
+      document.removeEventListener('contextmenu', handleContextMenu);
+      window.removeEventListener('resize', checkDevTools);
+    };
   }, []);
 
   const fetchScores = useCallback(async () => {
@@ -175,7 +210,7 @@ export default function Home() {
                 <Image src="/logo.svg" alt="최강삼성! 라이온즈" title="최강삼성! 라이온즈" fill style={{ objectFit: 'contain' }} />
               </div>
               <h2>라이언즈 팬 대시보드</h2>
-              <p>삼성 라이온즈 팬 프로젝트 v1.3.4</p>
+              <p>삼성 라이온즈 팬 프로젝트 v1.3.5</p>
             </div>
             <div className="disclaimer">
               <p>본 대시보드는 공개된 데이터를 사용하는 팬 메이드 프로젝트입니다.</p>
