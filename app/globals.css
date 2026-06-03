@@ -83,14 +83,21 @@
   -webkit-user-drag: none;
 }
 
-html,
+html {
+  background-color: var(--lions-blue);
+}
+
 body {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background-color: var(--lions-blue);
   font-family: 'A2z', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
   -webkit-touch-callout: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  background: transparent;
 }
 
 /* Background Overlay Image */
@@ -99,22 +106,14 @@ body::before {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  right: 0;
+  bottom: 0;
   background-image: url('https://images.unsplash.com/photo-1609455677069-6830c8f2ee52?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
   background-size: cover;
   background-position: center;
-  opacity: 0.25;
-  /* 50% 이하로 흐릿하게 설정 */
+  opacity: 0.2;
   z-index: -1;
-  filter: grayscale(20%);
-}
-
-body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
+  filter: saturate(1.2) brightness(0.8);
 }
 
 img {
