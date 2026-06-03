@@ -211,7 +211,7 @@ export default function Home() {
                 <Image src="/logo.svg" alt="최강삼성! 라이온즈" title="최강삼성! 라이온즈" fill style={{ objectFit: 'contain' }} />
               </div>
               <h2>라이언즈 팬 대시보드</h2>
-              <p>Lion Spirits Fan Project v1.4.0</p>
+              <p>Lion Spirits Fan Project v1.4.1</p>
 
               <div style={{ marginTop: '20px' }}>
                 <PremiumButton onClick={() => setShowDetails(true)}>
@@ -261,15 +261,16 @@ export default function Home() {
             <motion.div
               className="bottom-sheet"
               initial={{ y: "100%" }}
-              animate={{ y: "15%" }} /* 쫀득한 시작 위치 */
+              animate={{ y: "20%" }}
               exit={{ y: "100%" }}
               drag="y"
-              dragConstraints={{ top: -400, bottom: 0 }}
-              dragElastic={0.05} /* 물리법칙: 더 쫀득하게 설정 */
+              /* 한도 제한: 화면 위를 넘지 않도록 top 값을 -100 정도로 제한 */
+              dragConstraints={{ top: -120, bottom: 0 }}
+              dragElastic={0.08}
               onDragEnd={(e, info) => {
                 if (info.offset.y > 100) setShowDetails(false);
               }}
-              transition={{ type: "spring", damping: 25, stiffness: 180, mass: 0.8 }}
+              transition={{ type: "spring", damping: 25, stiffness: 200, mass: 0.8 }}
             >
               <div className="sheet-handle" />
               <div className="sheet-content">
@@ -315,8 +316,8 @@ export default function Home() {
                   </PremiumButton>
                 </div>
               </div>
-              {/* 아래쪽 끊김 방지를 위한 무한 배경 확장 */}
-              <div className="sheet-extended-bg" />
+              {/* 아래쪽 끊김 방지를 위한 무한 배경 확장 (더 길게!) */}
+              <div className="sheet-extended-bg-v2" />
             </motion.div>
           </>
         )}
@@ -353,11 +354,11 @@ export default function Home() {
         .bottom-sheet { 
           position: fixed; bottom: 0; left: 0; right: 0; max-width: 430px; margin: 0 auto; 
           background: white; border-radius: 32px 32px 0 0; z-index: 1001; 
-          padding: 12px 24px 40px; box-shadow: 0 -10px 40px rgba(0,0,0,0.15); 
-          touch-action: none; overflow: hidden; /* 스크롤바 강제 제거 */
+          padding: 12px 24px 60px; box-shadow: 0 -10px 40px rgba(0,0,0,0.15); 
+          touch-action: none; overflow: hidden;
         }
-        .sheet-extended-bg { 
-          position: absolute; top: 100%; left: 0; right: 0; height: 100vh; background: white; 
+        .sheet-extended-bg-v2 { 
+          position: absolute; top: 100%; left: -10px; right: -10px; height: 300vh; background: white; 
         }
         
         .sheet-handle { width: 36px; height: 5px; background: #DDD; border-radius: 10px; margin: 0 auto 32px; cursor: grab; }
