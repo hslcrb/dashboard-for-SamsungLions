@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { HomeIcon, MatchIcon, RankIcon, MoreIcon } from '../components/Icons';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('home');
@@ -208,7 +208,7 @@ export default function Home() {
                 <Image src="/logo.svg" alt="최강삼성! 라이온즈" title="최강삼성! 라이온즈" fill style={{ objectFit: 'contain' }} />
               </div>
               <h2>라이언즈 팬 대시보드</h2>
-              <p>Lion Spirits Fan Project v1.3.6</p>
+              <p>Lion Spirits Fan Project v1.3.7</p>
 
               <button
                 className="detail-btn"
@@ -246,7 +246,7 @@ export default function Home() {
         ))}
       </nav>
 
-      {/* 기술 스택 상세 모달 (Framer Motion) */}
+      {/* 기술 스택 상세 모달 (Drag & Better Spacing) */}
       <AnimatePresence>
         {showDetails && (
           <>
@@ -262,39 +262,54 @@ export default function Home() {
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
+              drag="y"
+              dragConstraints={{ top: 0 }}
+              dragElastic={0.2}
+              onDragEnd={(e, info) => {
+                if (info.offset.y > 100) setShowDetails(false);
+              }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
             >
               <div className="sheet-handle" />
               <div className="sheet-content">
-                <h3 className="sheet-title">Technical Specs</h3>
-                <div className="spec-row">
-                  <span className="spec-label">Framework</span>
-                  <span className="spec-value">Next.js v16.2.7</span>
-                </div>
-                <div className="spec-row">
-                  <span className="spec-label">Font Family</span>
-                  <span className="spec-value">A2z (에이투지체)</span>
-                </div>
-                <div className="spec-row">
-                  <span className="spec-label">Animation</span>
-                  <span className="spec-value">Framer Motion v11.x</span>
-                </div>
-                <div className="spec-row">
-                  <span className="spec-label">Deployment</span>
-                  <span className="spec-value">Vercel Edge Runtime</span>
+                <h3 className="sheet-title">Software Specifications</h3>
+
+                <div className="spec-list">
+                  <div className="spec-row">
+                    <span className="spec-label">Core Engine</span>
+                    <span className="spec-value">Next.js v16.2.7</span>
+                  </div>
+                  <div className="spec-row">
+                    <span className="spec-label">Base Font</span>
+                    <span className="spec-value">에이투지체 (A2z)</span>
+                  </div>
+                  <div className="spec-row">
+                    <span className="spec-label">Interaction</span>
+                    <span className="spec-value">Framer Motion v11</span>
+                  </div>
+                  <div className="spec-row">
+                    <span className="spec-label">Deployment</span>
+                    <span className="spec-value">Vercel Edge</span>
+                  </div>
+                  <div className="spec-row">
+                    <span className="spec-label">Developer</span>
+                    <span className="spec-value">Rhee Hose</span>
+                  </div>
                 </div>
 
-                <a
-                  href="https://noonnu.cc/font_page/1778"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-download-link"
-                >
-                  에이투지체 폰트 다운로드
-                </a>
+                <div style={{ marginTop: '32px', textAlign: 'center' }}>
+                  <a
+                    href="https://noonnu.cc/font_page/1778"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-download-link"
+                  >
+                    에이투지체 공식 다운로드
+                  </a>
+                </div>
 
                 <button className="close-btn" onClick={() => setShowDetails(false)}>
-                  확인
+                  닫기
                 </button>
               </div>
             </motion.div>
@@ -331,16 +346,18 @@ export default function Home() {
         .detail-btn { background: #074CA1; color: white; padding: 12px 24px; border-radius: 12px; border: none; font-weight: 700; font-size: 14px; margin-top: 20px; cursor: pointer; transition: all 0.2s; }
         .detail-btn:active { transform: scale(0.95); opacity: 0.9; }
 
-        /* Modal / Bottom Sheet */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); z-index: 1000; display: flex; justify-content: center; }
-        .bottom-sheet { position: fixed; bottom: 0; left: 0; right: 0; max-width: 430px; margin: 0 auto; background: white; border-radius: 32px 32px 0 0; z-index: 1001; padding: 20px 24px 40px; box-shadow: 0 -10px 40px rgba(0,0,0,0.1); }
-        .sheet-handle { width: 40px; height: 4px; background: #EEE; border-radius: 2px; margin: 0 auto 24px; }
-        .sheet-title { font-size: 20px; font-weight: 900; color: #074CA1; margin-bottom: 24px; text-align: center; }
-        .spec-row { display: flex; justifyContent: space-between; padding: 16px 0; border-bottom: 1px solid #F0F2F5; font-size: 14px; }
-        .spec-label { color: #8E8E93; font-weight: 600; }
-        .spec-value { color: #1A1A1A; font-weight: 800; }
-        .font-download-link { display: block; text-align: center; color: #074CA1; font-weight: 800; text-decoration: none; margin-top: 32px; font-size: 14px; }
-        .close-btn { width: 100%; height: 56px; background: #F8F9FA; border: none; border-radius: 16px; color: #1A1A1A; font-weight: 800; margin-top: 24px; cursor: pointer; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1000; }
+        .bottom-sheet { position: fixed; bottom: 0; left: 0; right: 0; max-width: 430px; margin: 0 auto; background: white; border-radius: 32px 32px 0 0; z-index: 1001; padding: 12px 24px 40px; box-shadow: 0 -10px 40px rgba(0,0,0,0.15); touch-action: none; }
+        .sheet-handle { width: 36px; height: 5px; background: #DDD; border-radius: 10px; margin: 0 auto 32px; cursor: grab; }
+        .sheet-handle:active { cursor: grabbing; }
+        .sheet-title { font-size: 18px; font-weight: 900; color: #074CA1; margin-bottom: 28px; text-align: center; letter-spacing: -0.5px; }
+        .spec-list { background: #F8F9FA; border-radius: 20px; padding: 8px 20px; }
+        .spec-row { display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid #EEE; font-size: 14px; gap: 40px; }
+        .spec-row:last-child { border-bottom: none; }
+        .spec-label { color: #8E8E93; font-weight: 700; flex-shrink: 0; }
+        .spec-value { color: #1A1A1A; font-weight: 800; text-align: right; word-break: break-all; }
+        .font-download-link { color: #074CA1; font-weight: 800; text-decoration: underline; font-size: 14px; }
+        .close-btn { width: 100%; height: 56px; background: #074CA1; border: none; border-radius: 16px; color: white; font-weight: 800; margin-top: 32px; cursor: pointer; font-size: 15px; }
 
         .logo-wrapper { position: relative; overflow: hidden; }
         .glint-effect { position: absolute; top: -100%; left: -100%; width: 300%; height: 300%; background: linear-gradient(135deg, rgba(255, 255, 255, 0) 40%, rgba(255, 255, 255, 0.9) 50%, rgba(255, 255, 255, 0) 60%); transform: rotate(25deg); animation: moveGlint 1.2s infinite linear; pointer-events: none; }
