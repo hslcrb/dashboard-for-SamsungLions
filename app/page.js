@@ -211,7 +211,7 @@ export default function Home() {
                 <Image src="/logo.svg" alt="최강삼성! 라이온즈" title="최강삼성! 라이온즈" fill style={{ objectFit: 'contain' }} />
               </div>
               <h2>라이언즈 팬 대시보드</h2>
-              <p>Lion Spirits Fan Project v1.3.9</p>
+              <p>Lion Spirits Fan Project v1.4.0</p>
 
               <div style={{ marginTop: '20px' }}>
                 <PremiumButton onClick={() => setShowDetails(true)}>
@@ -248,7 +248,6 @@ export default function Home() {
         ))}
       </nav>
 
-      {/* 기술 스택 상세 모달 (High Drag & Scrollable) */}
       <AnimatePresence>
         {showDetails && (
           <>
@@ -262,19 +261,15 @@ export default function Home() {
             <motion.div
               className="bottom-sheet"
               initial={{ y: "100%" }}
-              animate={{ y: "10%" }} // 살짝 올라온 상태로 시작
+              animate={{ y: "15%" }} /* 쫀득한 시작 위치 */
               exit={{ y: "100%" }}
               drag="y"
-              dragConstraints={{ top: -500, bottom: 0 }} // 위로 500px 더 끌어올릴 수 있게 설정
-              dragElastic={0.1}
+              dragConstraints={{ top: -400, bottom: 0 }}
+              dragElastic={0.05} /* 물리법칙: 더 쫀득하게 설정 */
               onDragEnd={(e, info) => {
-                if (info.offset.y > 150) setShowDetails(false);
+                if (info.offset.y > 100) setShowDetails(false);
               }}
-              transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              style={{
-                height: '95vh', // 거의 끝까지 올라가도록 높게 설정
-                paddingBottom: '200px' // 여백을 길게 줌
-              }}
+              transition={{ type: "spring", damping: 25, stiffness: 180, mass: 0.8 }}
             >
               <div className="sheet-handle" />
               <div className="sheet-content">
@@ -295,19 +290,11 @@ export default function Home() {
                   </div>
                   <div className="spec-row">
                     <span className="spec-label">Deployment</span>
-                    <span className="spec-value">Vercel Edge Runtime</span>
+                    <span className="spec-value">Vercel Edge</span>
                   </div>
                   <div className="spec-row">
                     <span className="spec-label">Developer</span>
                     <span className="spec-value">Rhee Hose (이호세)</span>
-                  </div>
-                  <div className="spec-row">
-                    <span className="spec-label">GitHub Repo</span>
-                    <span className="spec-value">
-                      <a href="https://github.com/hslcrb/dashboard-for-SamsungLions" target="_blank" rel="noopener noreferrer" className="no-underline-link">
-                        View Repository
-                      </a>
-                    </span>
                   </div>
                 </div>
 
@@ -318,18 +305,18 @@ export default function Home() {
                     rel="noopener noreferrer"
                     className="font-download-link no-underline-link"
                   >
-                    에이투지체 폰트 공식 다운로드
+                    에이투지체 공식 다운로드
                   </a>
                 </div>
 
                 <div style={{ marginTop: '32px' }}>
                   <PremiumButton onClick={() => setShowDetails(false)}>
-                    확인 및 닫기
+                    닫기
                   </PremiumButton>
                 </div>
-
-                <div style={{ height: '300px' }}></div> {/* 추가 여백 */}
               </div>
+              {/* 아래쪽 끊김 방지를 위한 무한 배경 확장 */}
+              <div className="sheet-extended-bg" />
             </motion.div>
           </>
         )}
@@ -362,19 +349,25 @@ export default function Home() {
         .icon-wrapper { width: 24px; height: 24px; display: flex; justify-content: center; align-items: center; }
         
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1000; }
-        .bottom-sheet { position: fixed; bottom: 0; left: 0; right: 0; max-width: 430px; margin: 0 auto; background: white; border-radius: 32px 32px 0 0; z-index: 1001; padding: 12px 24px 40px; box-shadow: 0 -10px 40px rgba(0,0,0,0.15); touch-action: none; overflow-y: auto; }
-        .sheet-handle { width: 36px; height: 5px; background: #DDD; border-radius: 10px; margin: 0 auto 32px; cursor: grab; flex-shrink: 0; }
-        .sheet-handle:active { cursor: grabbing; }
+        
+        .bottom-sheet { 
+          position: fixed; bottom: 0; left: 0; right: 0; max-width: 430px; margin: 0 auto; 
+          background: white; border-radius: 32px 32px 0 0; z-index: 1001; 
+          padding: 12px 24px 40px; box-shadow: 0 -10px 40px rgba(0,0,0,0.15); 
+          touch-action: none; overflow: hidden; /* 스크롤바 강제 제거 */
+        }
+        .sheet-extended-bg { 
+          position: absolute; top: 100%; left: 0; right: 0; height: 100vh; background: white; 
+        }
+        
+        .sheet-handle { width: 36px; height: 5px; background: #DDD; border-radius: 10px; margin: 0 auto 32px; cursor: grab; }
         .sheet-title { font-size: 18px; font-weight: 900; color: #074CA1; margin-bottom: 28px; text-align: center; letter-spacing: -0.5px; }
         .spec-list { background: #F8F9FA; border-radius: 20px; padding: 8px 20px; }
         .spec-row { display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid #EEE; font-size: 14px; gap: 40px; }
         .spec-row:last-child { border-bottom: none; }
         .spec-label { color: #8E8E93; font-weight: 700; flex-shrink: 0; }
         .spec-value { color: #1A1A1A; font-weight: 800; text-align: right; word-break: break-all; }
-        .font-download-link { color: #074CA1; font-weight: 800; font-size: 14px; }
-        
-        .no-underline-link { text-decoration: none !important; border-bottom: none !important; }
-        .no-underline-link:hover { text-decoration: none !important; }
+        .no-underline-link { text-decoration: none !important; color: #074CA1; font-weight: 800; }
 
         .logo-wrapper { position: relative; overflow: hidden; }
         .glint-effect { position: absolute; top: -100%; left: -100%; width: 300%; height: 300%; background: linear-gradient(135deg, rgba(255, 255, 255, 0) 40%, rgba(255, 255, 255, 0.9) 50%, rgba(255, 255, 255, 0) 60%); transform: rotate(25deg); animation: moveGlint 1.2s infinite linear; pointer-events: none; }
