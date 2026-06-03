@@ -1,228 +1,224 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { HomeIcon, MatchIcon, RankIcon, MoreIcon, LionIcon, DoveIcon } from '../components/Icons';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('home');
+  const [matchTime, setMatchTime] = useState('00:00:00');
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const now = new Date();
+      setMatchTime(now.toLocaleTimeString('ko-KR', { hour12: false }));
+    }, 1000);
+    const loadingTimeout = setTimeout(() => setIsLoading(false), 800);
+    return () => { clearInterval(timer); clearTimeout(loadingTimeout); };
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', width: '100vw', background: '#074CA1' }}>
+        <div className="premium-loader"></div>
+        <style jsx>{`
+          .premium-loader {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #fff;
+            border-radius: 50%;
+            animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+          }
+          @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        `}</style>
+      </div>
+    );
+  }
 
   const renderContent = () => {
     switch (activeTab) {
       case 'home':
         return (
-          <div className="scroll-area">
-            <div style={{ position: 'relative', width: '100%', height: '220px', borderRadius: '25px', overflow: 'hidden', marginBottom: '25px', boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}>
-              <Image
-                src="/hero.png"
-                alt="Samsung Lions Park"
-                fill
-                style={{ objectFit: 'cover' }}
-                priority
-              />
-              <div style={{ position: 'absolute', bottom: '0', left: '0', right: '0', background: 'linear-gradient(transparent, rgba(0,76,161,0.9))', padding: '20px' }}>
-                <h1 style={{ margin: 0, fontSize: '22px', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>최강삼성 승리하리라! 🦁</h1>
-                <p style={{ margin: '5px 0 0 0', fontSize: '13px', opacity: 0.9 }}>라팍의 푸른 사자들이 포효한다</p>
+          <div className="scroll-area animate-fade">
+            <div style={{ padding: '0 0 24px 0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                <LionIcon size={16} color="#074CA1" />
+                <p style={{ color: '#074CA1', fontWeight: 'bold', fontSize: '12px', margin: 0, letterSpacing: '1px' }}>SAMSUNG LIONS OFFICIAL</p>
               </div>
+              <h1 style={{ margin: 0 }}>승리의 라이온즈, 실시간 대시보드</h1>
             </div>
 
-            <div className="glass-card">
+            <div className="premium-card">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ width: '8px', height: '8px', background: '#FF3B30', borderRadius: '50%', boxShadow: '0 0 10px rgba(255, 59, 48, 0.5)' }}></span>
+                  <span style={{ fontSize: '13px', fontWeight: '800', color: '#FF3B30' }}>LIVE</span>
+                </div>
+                <span style={{ fontSize: '14px', fontWeight: '600', color: '#1A1A1A' }}>{matchTime}</span>
+              </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ margin: 0, color: 'var(--accent-silver)' }}>오늘의 BIG 매치</h2>
-                <span className="live-pill">LIVE 18:30</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', marginTop: '20px' }}>
                 <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '32px', marginBottom: '5px' }}>🦁</div>
-                  <div style={{ fontSize: '18px', fontWeight: 'bold' }}>삼성</div>
+                  <div style={{ fontSize: '13px', fontWeight: '700', color: '#666', marginBottom: '10px' }}>SAMSUNG</div>
+                  <div style={{ fontSize: '42px', color: '#074CA1', fontWeight: '900' }}>10</div>
                 </div>
+                <div style={{ fontSize: '18px', fontWeight: '200', color: '#E0E0E0' }}>VERSUS</div>
                 <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '24px', fontWeight: '900', color: 'rgba(255,255,255,0.4)' }}>VS</div>
-                </div>
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '32px', marginBottom: '5px' }}>🗼</div>
-                  <div style={{ fontSize: '18px', fontWeight: 'bold' }}>LG</div>
+                  <div style={{ fontSize: '13px', fontWeight: '700', color: '#666', marginBottom: '10px' }}>LG</div>
+                  <div style={{ fontSize: '42px', color: '#333', fontWeight: '900' }}>4</div>
                 </div>
               </div>
-              <p style={{ marginTop: '20px', textAlign: 'center', fontSize: '13px', color: 'rgba(255,255,255,0.7)' }}>📍 대구 삼성 라이온즈 파크</p>
-            </div>
-
-            <div className="glass-card">
-              <h2 style={{ color: 'var(--accent-silver)' }}>삼갤 실시간 민심 🔥</h2>
-              <div style={{ fontSize: '14px', lineHeight: '1.8' }}>
-                <p style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '8px 0' }}>
-                  <strong>익명:</strong> "오늘 선발 라인업 애미없노 ㅋㅋㅋ 그래도 믿어본다"
-                </p>
-                <p style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '8px 0' }}>
-                  <strong>푸른피의사자:</strong> "구자욱 오늘 연타석 홈런각 잡혔다 가즈아ㅏㅏ"
-                </p>
-                <p style={{ padding: '8px 0' }}>
-                  <strong>라팍주민:</strong> "벌써부터 라팍 앞 치킨 냄새 오지네... 직관러 부럽다"
-                </p>
+              <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid #F5F5F5' }}>
+                <p style={{ fontSize: '12px', textAlign: 'center', color: '#888' }}>라팍 파크 하단 지정석 | 9회말 무사 1, 2루</p>
               </div>
             </div>
 
-            <div className="glass-card" style={{ background: 'linear-gradient(to right, rgba(7, 76, 161, 0.4), rgba(0, 51, 102, 0.4))' }}>
-              <h3 style={{ fontSize: '15px' }}>📢 셈글(Semgle) 공지</h3>
-              <p style={{ fontSize: '13px', marginTop: '5px' }}>수원 한봄고 빅데이터정보과 기능반 '셈글' 단체응원 이벤트 예정!</p>
+            <div className="premium-card">
+              <h2 style={{ fontSize: '16px', marginBottom: '20px' }}>삼갤 실시간 한줄평</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {[
+                  { user: "익명1", text: "오늘 경기 지면 사람 아님 ㅋㅋㅋ 이미 이겼죠?" },
+                  { user: "푸른피", text: "가을 야구 냄새가 난다... 우승 적기다" },
+                  { user: "셈글호세", text: "한봄고 응원단 도착 완료! 목 터져라 부른다" }
+                ].map((post, i) => (
+                  <div key={i} style={{ display: 'flex', gap: '12px' }}>
+                    <div style={{ width: '36px', height: '36px', background: '#F8F9FA', borderRadius: '12px', flexShrink: 0, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                      <LionIcon size={14} color="#074CA1" />
+                    </div>
+                    <div>
+                      <span style={{ fontSize: '12px', fontWeight: '800', color: '#333' }}>{post.user}</span>
+                      <p style={{ fontSize: '13px', color: '#444', marginTop: '2px', lineHeight: '1.4' }}>{post.text}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <div style={{ height: '20px' }}></div>
+            <button className="action-button">티켓 예매 바로가기</button>
           </div>
         );
       case 'match':
         return (
-          <div className="scroll-area">
-            <h1 style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>경기 일정 <span style={{ fontSize: '18px' }}>⚾</span></h1>
-            {['2026.06.04 (목)', '2026.06.05 (금)', '2026.06.06 (토)', '2026.06.07 (일)'].map((date, idx) => (
-              <div key={idx} className="glass-card" style={{ borderLeft: idx === 0 ? '4px solid #fff' : '1px solid var(--glass-border)' }}>
-                <p style={{ fontWeight: 'bold', fontSize: '16px', color: idx === 0 ? '#fff' : 'rgba(255,255,255,0.8)' }}>{date}</p>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px' }}>
-                  <span style={{ fontSize: '15px' }}>{idx === 0 ? 'LG 트윈스 (라팍)' : 'SSG 랜더스 (문학)'}</span>
-                  <span style={{ fontWeight: 'bold', background: 'rgba(255,255,255,0.1)', padding: '4px 10px', borderRadius: '15px' }}>
-                    {idx > 1 ? '17:00' : '18:30'}
-                  </span>
+          <div className="scroll-area animate-fade">
+            <h1 style={{ marginBottom: '32px' }}>시즌 경기 스케줄</h1>
+            {[
+              { date: '2026.06.04', vs: 'LG 트윈스', place: '라팍', time: '18:30', isHome: true },
+              { date: '2026.06.05', vs: 'SSG 랜더스', place: '문학', time: '18:30', isHome: false },
+              { date: '2026.06.06', vs: 'SSG 랜더스', place: '문학', time: '17:00', isHome: false }
+            ].map((m, i) => (
+              <div key={i} className="premium-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                    {m.isHome && <div style={{ width: '6px', height: '6px', background: '#074CA1', borderRadius: '50%' }}></div>}
+                    <span style={{ fontSize: '12px', color: '#074CA1', fontWeight: '800' }}>{m.date}</span>
+                  </div>
+                  <h2 style={{ margin: 0, fontSize: '17px' }}>{m.vs}</h2>
+                  <p style={{ fontSize: '12px', color: '#999', marginTop: '2px' }}>{m.place} {m.isHome ? '(홈)' : '(원정)'}</p>
                 </div>
+                <div style={{ background: '#F8F9FA', padding: '8px 12px', borderRadius: '12px', fontSize: '15px', fontWeight: '800' }}>{m.time}</div>
               </div>
             ))}
           </div>
         );
       case 'rank':
         return (
-          <div className="scroll-area">
-            <h1>시즌 순위 <span style={{ fontSize: '18px' }}>🏆</span></h1>
-            <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', color: 'white' }}>
-                <thead style={{ background: 'rgba(255,255,255,0.1)' }}>
-                  <tr>
-                    <th style={{ padding: '15px', textAlign: 'left', fontSize: '14px' }}>순위</th>
-                    <th style={{ padding: '15px', textAlign: 'left', fontSize: '14px' }}>팀</th>
-                    <th style={{ padding: '15px', textAlign: 'right', fontSize: '14px' }}>승률</th>
+          <div className="scroll-area animate-fade">
+            <h1 style={{ marginBottom: '32px' }}>팀별 통합 순위</h1>
+            <div className="premium-card" style={{ padding: '0', overflow: 'hidden' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ background: '#F8F9FA' }}>
+                    <th style={{ padding: '16px', textAlign: 'left', fontSize: '12px', color: '#666', fontWeight: '800' }}>RANK</th>
+                    <th style={{ padding: '16px', textAlign: 'left', fontSize: '12px', color: '#666', fontWeight: '800' }}>TEAM</th>
+                    <th style={{ padding: '16px', textAlign: 'right', fontSize: '12px', color: '#666', fontWeight: '800' }}>WIN/RATE</th>
                   </tr>
                 </thead>
                 <tbody>
                   {[
-                    { rank: 1, name: '삼성', icon: '🦁', rate: '0.638', active: true },
-                    { rank: 2, name: 'KIA', icon: '🐯', rate: '0.591' },
-                    { rank: 3, name: 'LG', icon: '🗼', rate: '0.542' },
-                    { rank: 4, name: '한화', icon: '🦅', rate: '0.511' },
-                    { rank: 5, name: '두산', icon: '🐻', rate: '0.498' }
-                  ].map((team) => (
-                    <tr key={team.rank} style={{
-                      background: team.active ? 'rgba(7, 76, 161, 0.4)' : 'transparent',
-                      borderBottom: '1px solid rgba(255,255,255,0.05)'
-                    }}>
-                      <td style={{ padding: '18px 15px', fontWeight: team.active ? 'bold' : 'normal' }}>{team.rank}</td>
-                      <td style={{ padding: '18px 15px' }}>{team.icon} {team.name}</td>
-                      <td style={{ padding: '18px 15px', textAlign: 'right' }}>{team.rate}</td>
+                    { r: 1, t: '삼성', w: 45, l: 26, cur: true },
+                    { r: 2, t: 'KIA', w: 42, l: 29 },
+                    { r: 3, t: 'LG', w: 38, l: 33 },
+                    { r: 4, t: '한화', w: 35, l: 36 }
+                  ].map((row, i) => (
+                    <tr key={i} style={{ borderBottom: '1px solid #F0F0F0', background: row.cur ? 'rgba(7, 76, 161, 0.04)' : 'transparent' }}>
+                      <td style={{ padding: '20px 16px', fontWeight: '900', color: row.cur ? '#074CA1' : '#333' }}>{row.r}</td>
+                      <td style={{ padding: '20px 16px', fontWeight: '700' }}>{row.t === '삼성' ? '🦁 삼성' : row.t}</td>
+                      <td style={{ padding: '20px 16px', textAlign: 'right', fontSize: '13px', fontWeight: '600' }}>{row.w}승 {row.l}패</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            <p style={{ textAlign: 'center', marginTop: '15px', fontSize: '11px', opacity: 0.5 }}>※ 2026 KBO 공식 기록 기준</p>
           </div>
         );
       case 'more':
         return (
-          <div className="scroll-area">
-            <h1>더보기 <span style={{ fontSize: '18px' }}>⚙️</span></h1>
-
-            <div className="glass-card">
-              <h2 style={{ fontSize: '16px', color: 'var(--accent-silver)' }}>선한 능력으로 🕊️</h2>
-              <p style={{ fontStyle: 'italic', fontSize: '13px', lineHeight: '1.6', color: 'rgba(255,255,255,0.9)' }}>
-                "그 선한 능력에 우리 에워싸여 보호받으며 살아가리...<br />
-                주 언제나 우리와 함께 계셔 하루 또 하루 늘 새로워라."
-              </p>
-              <p style={{ textAlign: 'right', marginTop: '10px', fontSize: '12px', opacity: 0.7 }}>— 디트리히 본회퍼</p>
+          <div className="scroll-area animate-fade">
+            <h1 style={{ marginBottom: '32px' }}>설정 및 프로필</h1>
+            <div className="premium-card" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+              <div style={{ width: '60px', height: '60px', borderRadius: '18px', background: '#074CA1', display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
+                <LionIcon size={30} color="#fff" />
+              </div>
+              <div>
+                <h2 style={{ margin: 0, fontSize: '19px' }}>이호세 (Rhee Hose)</h2>
+                <p style={{ margin: '4px 0 0 0', fontSize: '12px' }}>Semgle | 수원 한봄고 빅데이터정보과</p>
+              </div>
             </div>
 
-            <div className="glass-card">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                <div style={{ width: '55px', height: '55px', borderRadius: '50%', background: 'linear-gradient(45deg, #074CA1, #001f3f)', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '24px', border: '2px solid rgba(255,255,255,0.3)' }}>🦁</div>
-                <div>
-                  <p style={{ fontWeight: 'bold', fontSize: '17px', margin: 0 }}>이호세 (Rhee Hose)</p>
-                  <p style={{ fontSize: '12px', opacity: 0.7, margin: '3px 0 0 0' }}>Semgle Cloud Computing</p>
+            <div className="premium-card">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                <DoveIcon size={16} color="#074CA1" />
+                <h2 style={{ margin: 0, fontSize: '14px', color: '#074CA1' }}>By Good Powers</h2>
+              </div>
+              <p style={{ fontStyle: 'italic', fontSize: '13px', color: '#444', lineHeight: '1.6' }}>
+                "그 선한 능력에 우리 에워싸여 보호받으며 살아가리... 주 언제나 우리와 함께 계셔 하루 또 하루 늘 새로워라."
+              </p>
+              <div style={{ textAlign: 'right', marginTop: '8px', fontSize: '11px', color: '#999' }}>Dietrich Bonhoeffer</div>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div className="premium-card" style={{ marginBottom: 0, padding: '18px 24px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontWeight: '700', fontSize: '14px' }}>알림 설정</span>
+                  <div style={{ width: '44px', height: '24px', background: '#074CA1', borderRadius: '100px', position: 'relative' }}>
+                    <div style={{ position: 'absolute', right: '3px', top: '3px', width: '18px', height: '18px', background: '#fff', borderRadius: '50%' }}></div>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            <div className="glass-card">
-              <h2 style={{ fontSize: '16px' }}>앱 설정</h2>
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '12px 0' }}>
-                <span>푸시 알림</span>
-                <span style={{ color: '#4CAF50', fontWeight: 'bold' }}>ON</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0' }}>
-                <span>테마</span>
-                <span>리퀴드 글래스</span>
+              <div className="premium-card" style={{ marginBottom: 0, padding: '18px 24px' }}>
+                <span style={{ fontWeight: '700', fontSize: '14px', color: '#FF3B30' }}>호주 이민 가이드 정보</span>
               </div>
             </div>
 
-            <div className="glass-button" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.6)' }}>
-              호주 이민 정보 상담 🌏
-            </div>
-
-            <div style={{ textAlign: 'center', marginTop: '40px', opacity: 0.4, fontSize: '10px', lineHeight: '2' }}>
-              <p>본 앱은 대한민국 자유민주주의를 사랑하는 팬의 작품입니다.</p>
-              <p>Designed and Built by Rhee Hose</p>
-              <p>고양이민주주의 (Cat Democracy) 🐈</p>
-              <p>© 2026 Samsung Lions Blue Blood Project</p>
+            <div style={{ textAlign: 'center', marginTop: '60px', opacity: 0.3, fontSize: '10px' }}>
+              <p>삼성라이온즈 크리에이티브 대시보드</p>
+              <p>Developer Rhee Hose (Semgle)</p>
+              <p>고양이민주주의 (Cat Democracy)</p>
             </div>
           </div>
         );
-      default:
-        return null;
+      default: return null;
     }
   };
 
   return (
-    <>
-      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '100px', background: 'linear-gradient(to bottom, rgba(0,31,63,0.5), transparent)', pointerEvents: 'none', zIndex: 10 }}></div>
-
+    <div className="app-container">
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: '#074CA1', zIndex: 1000 }}></div>
       {renderContent()}
-
       <nav className="bottom-nav">
         {[
-          { id: 'home', icon: '🏠', label: '홈' },
-          { id: 'match', icon: '⚾', label: '경기' },
-          { id: 'rank', icon: '📊', label: '순위' },
-          { id: 'more', icon: '⚙️', label: '설정' }
+          { id: 'home', icon: <HomeIcon />, label: '홈' },
+          { id: 'match', icon: <MatchIcon />, label: '일정' },
+          { id: 'rank', icon: <RankIcon />, label: '순위' },
+          { id: 'more', icon: <MoreIcon />, label: '더보기' }
         ].map((tab) => (
-          <div
-            key={tab.id}
-            className={`nav-item ${activeTab === tab.id ? 'active' : ''}`}
-            onClick={() => setActiveTab(tab.id)}
-          >
-            <span className="nav-icon" style={{ fontSize: activeTab === tab.id ? '22px' : '20px', transition: 'all 0.3s' }}>
-              {tab.icon}
-            </span>
-            <span style={{ fontWeight: activeTab === tab.id ? 'bold' : 'normal' }}>{tab.label}</span>
+          <div key={tab.id} className={`nav-item ${activeTab === tab.id ? 'active' : ''}`} onClick={() => setActiveTab(tab.id)}>
+            {tab.icon}
+            <span>{tab.label}</span>
           </div>
         ))}
       </nav>
-
-      <style jsx global>{`
-        .live-pill {
-          font-size: 11px;
-          background: #ff3b30;
-          padding: 3px 10px;
-          border-radius: 20px;
-          color: white;
-          font-weight: 800;
-          box-shadow: 0 0 10px rgba(255, 59, 48, 0.5);
-          animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-          0% { opacity: 1; }
-          50% { opacity: 0.6; }
-          100% { opacity: 1; }
-        }
-
-        .scroll-area::-webkit-scrollbar {
-          width: 0px;
-        }
-      `}</style>
-    </>
+    </div>
   );
 }
