@@ -8,23 +8,19 @@ export default function PremiumButton({ children, onClick, style = {} }) {
             className="premium-action-btn"
             onClick={onClick}
             style={style}
-            whileTap="tap"
             initial="initial"
             whileHover="hover"
+            whileTap="tap"
         >
             <span className="btn-text">{children}</span>
 
-            {/* 쫀득한 내부 채우기 애니메이션 */}
+            {/* 영롱한 블루 메쉬 그라데이션 오버레이 (Hover 시 노출) */}
             <motion.div
-                className="btn-filling"
+                className="mesh-gradient-overlay"
                 variants={{
-                    initial: { x: '-100%', opacity: 0 },
-                    hover: { x: '-80%', opacity: 0.1 },
-                    tap: {
-                        x: '0%',
-                        opacity: 0.3,
-                        transition: { duration: 0.3, ease: "easeOut" }
-                    }
+                    initial: { opacity: 0 },
+                    hover: { opacity: 1, transition: { duration: 0.4 } },
+                    tap: { opacity: 0.8 }
                 }}
                 style={{
                     position: 'absolute',
@@ -32,31 +28,36 @@ export default function PremiumButton({ children, onClick, style = {} }) {
                     left: 0,
                     width: '100%',
                     height: '100%',
-                    background: 'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%)',
+                    background: `
+            radial-gradient(at 0% 0%, #074CA1 0%, transparent 50%),
+            radial-gradient(at 100% 0%, #4facfe 0%, transparent 50%),
+            radial-gradient(at 100% 100%, #00f2fe 0%, transparent 50%),
+            radial-gradient(at 0% 100%, #074CA1 0%, transparent 50%)
+          `,
+                    filter: 'blur(10px)',
                     pointerEvents: 'none',
                     zIndex: 1
                 }}
             />
 
-            {/* 액티브 펄스 효과 */}
+            {/* 미세한 광택 효과 */}
             <motion.div
-                className="btn-shine"
+                className="shine-effect"
                 variants={{
-                    tap: {
-                        scale: [0.8, 1.5],
-                        opacity: [0.5, 0],
-                        transition: { duration: 0.6 }
+                    hover: {
+                        x: ['-100%', '100%'],
+                        transition: { duration: 1.5, repeat: Infinity, ease: "linear" }
                     }
                 }}
-                initial={{ scale: 0, opacity: 0 }}
                 style={{
                     position: 'absolute',
-                    width: '100%',
+                    top: 0,
+                    left: 0,
+                    width: '30%',
                     height: '100%',
-                    background: 'rgba(255,255,255,0.4)',
-                    borderRadius: 'inherit',
-                    pointerEvents: 'none',
-                    zIndex: 0
+                    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)',
+                    zIndex: 2,
+                    pointerEvents: 'none'
                 }}
             />
         </motion.button>
