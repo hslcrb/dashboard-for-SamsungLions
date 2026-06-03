@@ -12,7 +12,6 @@ export default function Home() {
   const [hasGame, setHasGame] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // 우클릭 금지 처리 (Disable right-click)
   useEffect(() => {
     const handleContextMenu = (e) => e.preventDefault();
     document.addEventListener('contextmenu', handleContextMenu);
@@ -22,7 +21,6 @@ export default function Home() {
   const fetchScores = useCallback(async () => {
     setIsRefreshing(true);
     try {
-      // 실제 프로젝트 API 엔드포인트 호출 (네이버 스포츠 API 기반)
       const res = await fetch('/api/scores');
       const data = await res.json();
       if (data.success) {
@@ -30,7 +28,7 @@ export default function Home() {
         setScoreData(data.game || null);
       }
     } catch (err) {
-      console.error("실시간 데이터 동기화 실패:", err);
+      console.error("데이터 동기화 실패:", err);
       setHasGame(false);
     } finally {
       setTimeout(() => setIsRefreshing(false), 500);
@@ -38,8 +36,13 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    fetchScores().then(() => setIsLoading(false));
-    // 30초마다 실제 API 통신 (Real API fetch every 30s)
+    const init = async () => {
+      await fetchScores();
+      // 데이터 수신 즉시 로딩 해제
+      setIsLoading(false);
+    };
+    init();
+
     const interval = setInterval(fetchScores, 30000);
     const clock = setInterval(() => {
       const now = new Date();
@@ -48,15 +51,48 @@ export default function Home() {
     return () => { clearInterval(interval); clearInterval(clock); };
   }, [fetchScores]);
 
+  // 프리미엄 로딩 화면 (커스텀 빛 효과)
   if (isLoading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', width: '100vw', background: '#074CA1' }}>
-        <div style={{ position: 'relative', width: '60px', height: '60px' }}>
-          <Image src="/logo.svg" alt="Lions" fill style={{ filter: 'brightness(0) invert(1)' }} className="loading-pulse" />
+      <div className="loading-screen">
+        <div className="logo-wrapper">
+          <Image src="/logo.svg" alt="Lions" width={120} height={100} priority />
+          <div className="glint-effect"></div>
         </div>
         <style jsx>{`
-          .loading-pulse { animation: pulse 1.2s ease-in-out infinite; }
-          @keyframes pulse { 0% { opacity: 0.5; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.5; transform: scale(0.9); } }
+          .loading-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+          }
+          .logo-wrapper {
+            position: relative;
+            overflow: hidden;
+          }
+          .glint-effect {
+            position: absolute;
+            top: -100%;
+            left: -100%;
+            width: 300%;
+            height: 300%;
+            background: linear-gradient(
+              135deg,
+              rgba(255, 255, 255, 0) 40%,
+              rgba(255, 255, 255, 0.9) 50%,
+              rgba(255, 255, 255, 0) 60%
+            );
+            transform: rotate(25deg);
+            animation: moveGlint 2s infinite ease-in-out;
+            pointer-events: none;
+          }
+          @keyframes moveGlint {
+            0% { transform: translateY(-20%) translateX(-20%) rotate(25deg); }
+            100% { transform: translateY(20%) translateX(20%) rotate(25deg); }
+          }
         `}</style>
       </div>
     );
@@ -69,11 +105,9 @@ export default function Home() {
           <div className="scroll-area animate-fade">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 0 28px 0' }}>
               <div style={{ position: 'relative', width: '120px', height: '40px' }}>
-                <Image src="/logo.svg" alt="Lions Dashboard" fill style={{ objectFit: 'contain', objectPosition: 'left' }} />
+                <Image src="/logo.svg" alt="Samsung Lions" fill style={{ objectFit: 'contain', objectPosition: 'left' }} />
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(7, 76, 161, 0.05)', padding: '6px 14px', borderRadius: '100px' }}>
-                <span style={{ fontSize: '11px', fontWeight: '800', color: '#074CA1' }}>REAL-TIME SYNC</span>
-              </div>
+              <div className="badge-fan">FAN DASHBOARD</div>
             </div>
 
             {hasGame && scoreData ? (
@@ -82,7 +116,7 @@ export default function Home() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span className={scoreData.isLive ? "live-dot" : "inactive-dot"}></span>
                     <span style={{ fontSize: '13px', fontWeight: '950', color: scoreData.isLive ? '#FF3B30' : '#8E8E93' }}>
-                      {scoreData.isLive ? 'LIVE' : 'SCORE'}
+                      {scoreData.isLive ? 'LIVE' : 'GAME'}
                     </span>
                   </div>
                   <span style={{ fontSize: '13px', fontWeight: '600', color: '#8E8E93' }}>{matchTime}</span>
@@ -91,7 +125,7 @@ export default function Home() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ textAlign: 'center', flex: 1 }}>
                     <div style={{ position: 'relative', width: '32px', height: '26px', margin: '0 auto 10px' }}>
-                      <Image src="/logo.svg" alt="Lions" fill style={{ objectFit: 'contain' }} />
+                      <Image src="/logo.svg" alt="L" fill style={{ objectFit: 'contain' }} />
                     </div>
                     <div className="score-number">{scoreData.homeScore ?? 0}</div>
                   </div>
@@ -102,39 +136,28 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid #F2F4F7', textAlign: 'center' }}>
-                  <p style={{ fontSize: '14px', color: '#1A1A1A', fontWeight: '900' }}>
-                    {scoreData.status} {scoreData.inning && `| ${scoreData.inning}`}
-                  </p>
-                  <p style={{ fontSize: '10px', color: '#074CA1', fontWeight: '700', marginTop: '8px', opacity: 0.6 }}>
-                    30초 간격으로 공식 KBO 데이터 동기화 중
-                  </p>
+                <div className="card-footer-info">
+                  <p>{scoreData.status} {scoreData.inning && `| ${scoreData.inning}`}</p>
+                  <p className="sync-text">30초 간격 실시간 자동 동기화</p>
                 </div>
               </div>
             ) : (
-              <div className="premium-card" style={{ padding: '60px 24px', textAlign: 'center' }}>
-                <h2 style={{ fontSize: '18px', color: '#333', margin: 0, fontWeight: '800' }}>오늘은 경기가 없습니다</h2>
-                <p style={{ fontSize: '13px', color: '#999', marginTop: '8px' }}>데이터 소스: Naver Sports API</p>
-                <div className="action-button" style={{ marginTop: '24px', display: 'inline-block', width: 'auto', padding: '12px 32px' }} onClick={fetchScores}>
-                  새로 갱신
-                </div>
+              <div className="premium-card empty-state">
+                <h2 style={{ fontSize: '18px', margin: 0, fontWeight: '800' }}>오늘은 경기가 없습니다</h2>
+                <p style={{ fontSize: '13px', color: '#999', marginTop: '8px' }}>Naver Sports API 데이터 기준</p>
               </div>
             )}
 
             <div className="premium-card">
-              <h2 style={{ fontSize: '17px', marginBottom: '15px', fontWeight: '900' }}>대시보드 알림</h2>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <div style={{ padding: '15px', background: '#F8F9FA', borderRadius: '18px' }}>
-                  <p style={{ color: '#1A1A1A', fontWeight: '700', fontSize: '14px' }}>경기 결과 및 기록 실시간 업데이트 완료</p>
-                </div>
-                <div style={{ padding: '15px', background: '#F8F9FA', borderRadius: '18px' }}>
-                  <p style={{ color: '#1A1A1A', fontWeight: '700', fontSize: '14px' }}>라팍 주관 경기 예매 안내 공지</p>
-                </div>
+              <h2 className="section-title">최신 브리핑</h2>
+              <div className="simple-list">
+                <div className="list-item">라이온즈 파크 홈 경기 예매 일람 업데이트</div>
+                <div className="list-item">주요 선수 기록 및 성적 실시간 집계 중</div>
               </div>
             </div>
 
-            <button className="action-button" style={{ opacity: isRefreshing ? 0.7 : 1 }} onClick={fetchScores}>
-              {isRefreshing ? '데이터 동기화 중...' : '데이터 수동 동기화'}
+            <button className="action-button" onClick={fetchScores}>
+              {isRefreshing ? '데이터 갱신 중...' : '데이터 수동 갱신'}
             </button>
             <div style={{ height: '30px' }}></div>
           </div>
@@ -142,15 +165,15 @@ export default function Home() {
       case 'match':
         return (
           <div className="scroll-area animate-fade">
-            <h1 style={{ marginBottom: '32px' }}>경기 일정</h1>
+            <h1>경기 일정</h1>
             {[
               { date: '2026.06.04', vs: 'LG 트윈스', place: '대구' },
               { date: '2026.06.05', vs: 'SSG 랜더스', place: '인천' }
             ].map((m, i) => (
-              <div key={i} className="premium-card">
-                <span style={{ fontSize: '12px', color: '#074CA1', fontWeight: '950' }}>{m.date}</span>
-                <h2 style={{ margin: '6px 0 0 0', fontSize: '19px' }}>{m.vs}</h2>
-                <p style={{ color: '#999', fontSize: '13px' }}>{m.place}</p>
+              <div key={i} className="premium-card schedule-card">
+                <span className="date-badge">{m.date}</span>
+                <h2>{m.vs}</h2>
+                <p>{m.place}</p>
               </div>
             ))}
           </div>
@@ -158,21 +181,15 @@ export default function Home() {
       case 'rank':
         return (
           <div className="scroll-area animate-fade">
-            <h1 style={{ marginBottom: '32px' }}>리그 순위</h1>
-            <div className="premium-card" style={{ padding: '0', overflow: 'hidden' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <h1>시즌 성적</h1>
+            <div className="premium-card table-card">
+              <table>
                 <thead>
-                  <tr style={{ background: '#F8F9FA' }}>
-                    <th style={{ padding: '16px', textAlign: 'left', fontSize: '12px', fontWeight: '900' }}>RANK</th>
-                    <th style={{ padding: '16px', textAlign: 'left', fontSize: '12px', fontWeight: '900' }}>TEAM</th>
-                    <th style={{ padding: '16px', textAlign: 'right', fontSize: '12px', fontWeight: '900' }}>RATE</th>
-                  </tr>
+                  <tr><th>순위</th><th>팀 명</th><th style={{ textAlign: 'right' }}>승률</th></tr>
                 </thead>
                 <tbody>
-                  <tr style={{ background: 'rgba(7, 76, 161, 0.04)' }}>
-                    <td style={{ padding: '22px 16px', fontWeight: '950', color: '#074CA1' }}>1</td>
-                    <td style={{ padding: '22px 16px', fontWeight: '800' }}>삼성 라이온즈</td>
-                    <td style={{ padding: '22px 16px', textAlign: 'right', fontWeight: '950' }}>0.658</td>
+                  <tr className="highlight-row">
+                    <td>1</td><td>삼성 라이온즈</td><td style={{ textAlign: 'right' }}>0.658</td>
                   </tr>
                 </tbody>
               </table>
@@ -183,16 +200,16 @@ export default function Home() {
         return (
           <div className="scroll-area animate-fade">
             <h1>정보</h1>
-            <div className="premium-card" style={{ padding: '48px 24px', textAlign: 'center' }}>
-              <div style={{ position: 'relative', width: '110px', height: '80px', margin: '0 auto 24px' }}>
-                <Image src="/logo.svg" alt="Lions Logo" fill style={{ objectFit: 'contain' }} />
+            <div className="premium-card info-card">
+              <div className="info-logo">
+                <Image src="/logo.svg" alt="Lions" fill style={{ objectFit: 'contain' }} />
               </div>
-              <h2 style={{ margin: '0 0 8px 0', fontSize: '22px', fontWeight: '900' }}>LIONS FAN DASHBOARD</h2>
-              <p style={{ fontSize: '13px', color: '#BBB' }}>Version 1.2.7 | Fan Edition</p>
+              <h2>LIONS FAN DASHBOARD</h2>
+              <p>개인 제작 팬 프로젝트 v1.2.8</p>
             </div>
-            <div style={{ textAlign: 'center', marginTop: '60px', opacity: 0.15, fontSize: '9px', fontWeight: '700' }}>
-              <p>본 서비스의 데이터는 네이버 스포츠 API를 통해 실시간으로 제공됩니다.</p>
-              <p>© 2026 FAN PROJECT | ALL RIGHTS RESERVED</p>
+            <div className="copyright-area">
+              <p>본 서비스는 개인적으로 제작된 팬 프로젝트입니다.</p>
+              <p>© 2026 FAN PROJECT</p>
             </div>
           </div>
         );
@@ -208,12 +225,10 @@ export default function Home() {
           { id: 'home', icon: <HomeIcon />, label: '홈' },
           { id: 'match', icon: <MatchIcon />, label: '일정' },
           { id: 'rank', icon: <RankIcon />, label: '순위' },
-          { id: 'more', icon: <MoreIcon />, label: '정보' }
+          { id: 'more', icon: <MoreIcon />, label: '더보기' }
         ].map((tab) => (
           <div key={tab.id} className={`nav-item ${activeTab === tab.id ? 'active' : ''}`} onClick={() => setActiveTab(tab.id)}>
-            <div style={{ width: '24px', height: '24px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              {tab.icon}
-            </div>
+            <div className="nav-icon-box">{tab.icon}</div>
             <span>{tab.label}</span>
           </div>
         ))}
@@ -224,7 +239,23 @@ export default function Home() {
         .inactive-dot { width: 8px; height: 8px; background: #8E8E93; border-radius: 50%; }
         .score-number { font-size: 58px; color: #074CA1; font-weight: 950; letter-spacing: -3px; line-height: 1; }
         .score-number.dark { color: #1A1A1A; }
-        .premium-card.refreshing { opacity: 0.5; transform: scale(0.99); }
+        .premium-card.refreshing { opacity: 0.5; transform: scale(0.995); }
+        .badge-fan { font-size: 11px; font-weight: 800; color: #074CA1; background: rgba(7, 76, 161, 0.05); padding: 6px 14px; border-radius: 100px; }
+        .sync-text { font-size: 10px; color: #074CA1; font-weight: 700; marginTop: 8px; opacity: 0.6; }
+        .card-footer-info { margin-top: 24px; padding-top: 16px; border-top: 1px solid #F2F4F7; text-align: center; }
+        .card-footer-info p { font-size: 14px; color: #1A1A1A; font-weight: 900; margin: 0; }
+        .empty-state { padding: 60px 24px; text-align: center; }
+        .section-title { font-size: 17px; margin-bottom: 15px; font-weight: 900; }
+        .list-item { padding: 15px; background: #F8F9FA; border-radius: 18px; color: #1A1A1A; font-weight: 700; font-size: 14px; margin-bottom: 10px; }
+        .date-badge { font-size: 12px; color: #074CA1; font-weight: 950; }
+        .table-card table { width: 100%; border-collapse: collapse; }
+        .table-card th { padding: 16px; text-align: left; font-size: 12px; font-weight: 900; color: #8E8E93; }
+        .highlight-row { background: rgba(7, 76, 161, 0.04); }
+        .highlight-row td { padding: 22px 16px; font-weight: 800; }
+        .info-card { padding: 48px 24px; text-align: center; }
+        .info-logo { position: relative; width: 110px; height: 80px; margin: 0 auto 24px; }
+        .copyright-area { text-align: center; marginTop: 60px; opacity: 0.15; font-size: 9px; font-weight: 700; }
+        .nav-icon-box { width: 24px; height: 24px; display: flex; justifyContent: center; alignItems: center; }
         @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.4); } 100% { opacity: 1; transform: scale(1); } }
       `}</style>
     </div>
