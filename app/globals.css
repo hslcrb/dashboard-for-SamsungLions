@@ -3,6 +3,7 @@
   src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2601-6@1.0/에이투지체-1Thin.woff2') format('woff2');
   font-weight: 100;
   font-display: swap;
+  /* Rendering First: 시스템 폰트로 먼저 렌더링 후 교체 */
 }
 
 @font-face {
@@ -91,7 +92,8 @@ body {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  font-family: 'A2z', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+  /* 폰트 폴백 최적화: 시스템 폰트를 앞에 두어 초기 렌더링 속도 극대화 */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, 'A2z';
   -webkit-touch-callout: none;
   display: flex;
   justify-content: center;
@@ -100,7 +102,17 @@ body {
   background: transparent;
 }
 
-/* Background Overlay Image */
+/* 폰트가 로드되었을 때 비로소 A2z 적용 (CSS 폰트 로딩 최적화) */
+@font-face {
+  font-family: 'A2z';
+  font-display: swap;
+}
+
+.app-container {
+  font-family: 'A2z', sans-serif;
+}
+
+/* Background Overlay Image (Low Quality First/Lazy Optimized) */
 body::before {
   content: "";
   position: fixed;
@@ -108,12 +120,13 @@ body::before {
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: url('https://images.unsplash.com/photo-1609455677069-6830c8f2ee52?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+  /* Unsplash 파라미터 최적화: 압축률 증가 및 해상도 조절로 초기 로딩 속도 상향 */
+  background-image: url('https://images.unsplash.com/photo-1609455677069-6830c8f2ee52?q=30&w=800&auto=format&fit=crop');
   background-size: cover;
   background-position: center;
-  opacity: 0.2;
+  opacity: 0.15;
   z-index: -1;
-  filter: saturate(1.2) brightness(0.8);
+  filter: saturate(1.1) brightness(0.7);
 }
 
 img {
@@ -285,4 +298,30 @@ p {
   position: relative;
   z-index: 2;
   pointer-events: none;
+}
+
+/* Modal / Bottom Sheet Core */
+.bottom-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 430px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 32px 32px 0 0;
+  z-index: 1001;
+  padding: 12px 24px 40px;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15);
+  touch-action: none;
+  overflow: hidden;
+}
+
+.sheet-extended-bg {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  background: white;
 }
