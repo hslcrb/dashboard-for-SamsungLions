@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { HomeIcon, MatchIcon, RankIcon, MoreIcon, LionIcon } from '../components/Icons';
 
@@ -8,27 +8,58 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState('home');
   const [matchTime, setMatchTime] = useState('00:00:00');
   const [isLoading, setIsLoading] = useState(true);
+  const [scoreData, setScoreData] = useState(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // 실시간 데이터 가져오기 (Fetch real-time data)
+  const fetchScores = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      const res = await fetch('/api/scores');
+      const data = await res.json();
+      if (data.success) {
+        setScoreData(data.game);
+      }
+    } catch (err) {
+      console.error("데이터 로드 실패:", err);
+    } finally {
+      setTimeout(() => setIsRefreshing(false), 500);
+    }
+  }, []);
 
   useEffect(() => {
-    const timer = setInterval(() => {
+    // 초기 로딩
+    fetchScores().then(() => setIsLoading(false));
+
+    // 10초마다 갱신
+    const interval = setInterval(fetchScores, 10000);
+
+    // 시계 타이머
+    const clock = setInterval(() => {
       const now = new Date();
       setMatchTime(now.toLocaleTimeString('ko-KR', { hour12: false }));
     }, 1000);
-    const loadingTimeout = setTimeout(() => setIsLoading(false), 600);
-    return () => { clearInterval(timer); clearTimeout(loadingTimeout); };
-  }, []);
+
+    return () => {
+      clearInterval(interval);
+      clearInterval(clock);
+    };
+  }, [fetchScores]);
 
   if (isLoading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', width: '100vw', background: '#074CA1' }}>
-        <div style={{ position: 'relative', width: '80px', height: '80px' }}>
-          <Image src="/logo.svg" alt="Lions Logo" fill style={{ filter: 'brightness(0) invert(1)' }} className="loading-logo" />
-        </div>
+        <div className="premium-loader"></div>
         <style jsx>{`
-          .loading-logo {
-            animation: pulse 1.5s ease-in-out infinite;
+          .premium-loader {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
           }
-          @keyframes pulse { 0% { transform: scale(0.95); opacity: 0.6; } 50% { transform: scale(1.05); opacity: 1; } 100% { transform: scale(0.95); opacity: 0.6; } }
+          @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         `}</style>
       </div>
     );
@@ -40,88 +71,80 @@ export default function Home() {
         return (
           <div className="scroll-area animate-fade">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 0 28px 0' }}>
-              <div style={{ position: 'relative', width: '120px', height: '40px' }}>
+              <div style={{ position: 'relative', width: '110px', height: '36px' }}>
                 <Image src="/logo.svg" alt="Samsung Lions" fill style={{ objectFit: 'contain', objectPosition: 'left' }} />
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(7, 76, 161, 0.05)', padding: '6px 12px', borderRadius: '100px' }}>
-                <LionIcon size={14} color="#074CA1" />
-                <span style={{ fontSize: '11px', fontWeight: '800', color: '#074CA1', letterSpacing: '0.5px' }}>OFFICIAL APP</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(7, 76, 161, 0.05)', padding: '6px 12px', borderRadius: '100px' }}>
+                  <LionIcon size={14} color="#074CA1" />
+                  <span style={{ fontSize: '11px', fontWeight: '800', color: '#074CA1' }}>LIVE UPDATES</span>
+                </div>
               </div>
             </div>
 
-            <div className="premium-card">
+            <div className={`premium-card ${isRefreshing ? 'refreshing' : ''}`}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ width: '8px', height: '8px', background: '#FF3B30', borderRadius: '50%', boxShadow: '0 0 12px rgba(255, 59, 48, 0.6)' }}></span>
-                  <span style={{ fontSize: '13px', fontWeight: '800', color: '#FF3B30', letterSpacing: '0.5px' }}>LIVE SCORE</span>
+                  <span className="live-dot"></span>
+                  <span style={{ fontSize: '13px', fontWeight: '800', color: '#FF3B30', letterSpacing: '0.5px' }}>
+                    {scoreData?.isLive ? 'LIVE SCORE' : 'RECENT RESULT'}
+                  </span>
                 </div>
-                <span style={{ fontSize: '14px', fontWeight: '600', color: '#1A1A1A' }}>{matchTime}</span>
+                <span style={{ fontSize: '13px', fontWeight: '600', color: '#999' }}>{matchTime}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0' }}>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ textAlign: 'center', flex: 1 }}>
-                  <div style={{ width: '40px', height: '30px', position: 'relative', margin: '0 auto 10px' }}>
-                    <Image src="/logo.svg" alt="Samsungs" fill style={{ objectFit: 'contain' }} />
-                  </div>
-                  <div style={{ fontSize: '48px', color: '#074CA1', fontWeight: '900', letterSpacing: '-2px' }}>12</div>
+                  <div style={{ fontSize: '14px', fontWeight: '800', color: '#074CA1', marginBottom: '12px' }}>{scoreData?.home || 'SAMSUNG'}</div>
+                  <div className="score-number">{scoreData?.homeScore ?? 0}</div>
                 </div>
-                <div style={{ fontSize: '16px', fontWeight: '200', color: '#DDD', margin: '0 20px' }}>VS</div>
+                <div style={{ fontSize: '16px', fontWeight: '200', color: '#DDD', padding: '0 15px' }}>VS</div>
                 <div style={{ textAlign: 'center', flex: 1 }}>
-                  <div style={{ fontSize: '14px', fontWeight: '800', color: '#333', marginBottom: '14px' }}>TWINS</div>
-                  <div style={{ fontSize: '48px', color: '#333', fontWeight: '900', letterSpacing: '-2px' }}>5</div>
+                  <div style={{ fontSize: '14px', fontWeight: '800', color: '#333', marginBottom: '12px' }}>{scoreData?.away || 'TWINS'}</div>
+                  <div className="score-number dark">{scoreData?.awayScore ?? 0}</div>
                 </div>
               </div>
-              <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid #F0F2F5' }}>
-                <p style={{ fontSize: '12px', textAlign: 'center', color: '#8E8E93', fontWeight: '500' }}>라팍 파크하단 지정석 관람 중 | 9회말 무사 1,2루</p>
+
+              <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid #F2F4F7', textAlign: 'center' }}>
+                <p style={{ fontSize: '12px', color: '#666', fontWeight: '600' }}>
+                  {scoreData?.status} | {scoreData?.inning}
+                </p>
+                <p style={{ fontSize: '10px', color: '#BBB', marginTop: '4px' }}>10초마다 자동 갱신 중</p>
               </div>
             </div>
 
             <div className="premium-card">
-              <h2 style={{ fontSize: '17px', color: '#1A1A1A', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                팬 커뮤니티 실시간 반응
-              </h2>
+              <h2 style={{ fontSize: '17px', marginBottom: '20px' }}>오늘의 뉴스</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {[
-                  { user: "라이온즈심장", text: "오늘 타선 폭발 실화냐? ㄷㄷ 대구 온 보람 있네" },
-                  { user: "블루피의사자", text: "구자욱 연타석 홈런 가즈아ㅏㅏㅏ 무조건 이긴다" },
-                  { user: "승리요정", text: "오늘 원태인 폼 미쳤음.. 9이닝 가자!" }
-                ].map((post, i) => (
-                  <div key={i} style={{ display: 'flex', gap: '12px', borderBottom: i < 2 ? '1px solid #F8F9FA' : 'none', paddingBottom: i < 2 ? '16px' : '0' }}>
-                    <div style={{ width: '36px', height: '36px', background: '#F0F2F5', borderRadius: '12px', flexShrink: 0, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                      <LionIcon size={16} color="#074CA1" />
-                    </div>
-                    <div>
-                      <span style={{ fontSize: '12px', fontWeight: '800', color: '#333' }}>{post.user}</span>
-                      <p style={{ fontSize: '13px', color: '#444', marginTop: '3px', lineHeight: '1.5' }}>{post.text}</p>
-                    </div>
+                  { title: "원태인, 리그 다승 단독 1위 질주", time: "2시간 전" },
+                  { title: "구자욱 부상 복귀 후 맹타, '캡틴의 귀환'", time: "4시간 전" },
+                  { title: "라이온즈 파크 주말 경기 매진 임박", time: "6시간 전" }
+                ].map((news, i) => (
+                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <p style={{ fontWeight: '600', color: '#333', fontSize: '14px' }}>{news.title}</p>
+                    <span style={{ fontSize: '11px', color: '#BBB' }}>{news.time}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <button className="action-button" style={{ boxShadow: '0 8px 20px rgba(7, 76, 161, 0.2)' }}>
-              공식 티켓 예매하기
-            </button>
+            <button className="action-button" onClick={fetchScores}>수동으로 갱신하기</button>
+            <div style={{ height: '20px' }}></div>
           </div>
         );
       case 'match':
         return (
           <div className="scroll-area animate-fade">
-            <h1 style={{ marginBottom: '32px' }}>경기 일정</h1>
+            <h1>경기 일정</h1>
             {[
-              { date: '2026.06.04', vs: 'LG 트윈스', place: '대구', time: '18:30', isHome: true },
-              { date: '2026.06.05', vs: 'SSG 랜더스', place: '인천', time: '18:30', isHome: false },
-              { date: '2026.06.06', vs: 'SSG 랜더스', place: '인천', time: '17:00', isHome: false }
+              { date: '2026.06.04', vs: 'LG 트윈스', place: '대구', status: '진행예정' },
+              { date: '2026.06.05', vs: 'SSG 랜더스', place: '인천', status: '진행예정' }
             ].map((m, i) => (
-              <div key={i} className="premium-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderLeft: m.isHome ? '4px solid #074CA1' : '1px solid rgba(0,0,0,0.05)' }}>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                    <span style={{ fontSize: '12px', color: '#074CA1', fontWeight: '800', letterSpacing: '0.5px' }}>{m.date}</span>
-                    {m.isHome && <span style={{ fontSize: '10px', background: '#074CA1', color: '#fff', padding: '1px 5px', borderRadius: '4px', fontWeight: '700' }}>HOME</span>}
-                  </div>
-                  <h2 style={{ margin: 0, fontSize: '18px' }}>{m.vs}</h2>
-                  <p style={{ fontSize: '12px', color: '#999', marginTop: '2px' }}>{m.place} {m.isHome ? '라이온즈 파크' : '원정 매정'}</p>
-                </div>
-                <div style={{ background: '#F0F2F5', padding: '10px 16px', borderRadius: '14px', fontSize: '16px', fontWeight: '800', color: '#1A1A1A' }}>{m.time}</div>
+              <div key={i} className="premium-card">
+                <span style={{ fontSize: '12px', color: '#074CA1', fontWeight: '800' }}>{m.date}</span>
+                <h2 style={{ margin: '4px 0 0 0' }}>{m.vs}</h2>
+                <p>{m.place} | {m.status}</p>
               </div>
             ))}
           </div>
@@ -129,69 +152,47 @@ export default function Home() {
       case 'rank':
         return (
           <div className="scroll-area animate-fade">
-            <h1 style={{ marginBottom: '32px' }}>시즌 통합 순위</h1>
+            <h1>시즌 성적</h1>
             <div className="premium-card" style={{ padding: '0', overflow: 'hidden' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ background: '#F8F9FA' }}>
-                    <th style={{ padding: '16px', textAlign: 'left', fontSize: '12px', color: '#8E8E93', fontWeight: '800', letterSpacing: '0.5px' }}>RANK</th>
-                    <th style={{ padding: '16px', textAlign: 'left', fontSize: '12px', color: '#8E8E93', fontWeight: '800', letterSpacing: '0.5px' }}>TEAM</th>
-                    <th style={{ padding: '16px', textAlign: 'right', fontSize: '12px', color: '#8E8E93', fontWeight: '800', letterSpacing: '0.5px' }}>WIN RATE</th>
+                    <th style={{ padding: '16px', textAlign: 'left', fontSize: '12px' }}>순위</th>
+                    <th style={{ padding: '16px', textAlign: 'left', fontSize: '12px' }}>팀</th>
+                    <th style={{ padding: '16px', textAlign: 'right', fontSize: '12px' }}>승리</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {[
-                    { r: 1, t: '삼성', w: 48, l: 25, isMe: true },
-                    { r: 2, t: 'KIA', w: 44, l: 30 },
-                    { r: 3, t: 'LG', w: 41, l: 33 },
-                    { r: 4, t: '두산', w: 39, l: 35 }
-                  ].map((row, i) => (
-                    <tr key={i} style={{ borderBottom: '1px solid #F0F2F5', background: row.isMe ? 'rgba(7, 76, 161, 0.04)' : 'transparent' }}>
-                      <td style={{ padding: '20px 16px', fontWeight: '900', color: row.isMe ? '#074CA1' : '#1A1A1A' }}>{row.r}</td>
-                      <td style={{ padding: '20px 16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        {row.isMe && <div style={{ width: '16px', height: '16px', position: 'relative' }}><Image src="/logo.svg" alt="L" fill /></div>}
-                        <span style={{ fontWeight: '700' }}>{row.t} 라이온즈</span>
-                      </td>
-                      <td style={{ padding: '20px 16px', textAlign: 'right', fontSize: '14px', fontWeight: '800', color: row.isMe ? '#074CA1' : '#1A1A1A' }}>{(row.w / (row.w + row.l)).toFixed(3)}</td>
-                    </tr>
-                  ))}
+                  <tr style={{ background: 'rgba(7, 76, 161, 0.04)' }}>
+                    <td style={{ padding: '20px 16px', fontWeight: '900' }}>1</td>
+                    <td style={{ padding: '20px 16px', fontWeight: '700' }}>삼성</td>
+                    <td style={{ padding: '20px 16px', textAlign: 'right', fontWeight: '800' }}>48</td>
+                  </tr>
                 </tbody>
               </table>
             </div>
-            <p style={{ textAlign: 'center', marginTop: '20px', fontSize: '11px', color: '#BBB' }}>※ 2026 KBO 공식 기록 데이터</p>
           </div>
         );
       case 'more':
         return (
           <div className="scroll-area animate-fade">
-            <h1 style={{ marginBottom: '32px' }}>설정</h1>
-            <div className="premium-card" style={{ padding: '32px 24px', textAlign: 'center' }}>
-              <div style={{ position: 'relative', width: '80px', height: '60px', margin: '0 auto 20px' }}>
-                <Image src="/logo.svg" alt="Official Logo" fill style={{ objectFit: 'contain' }} />
-              </div>
-              <h2 style={{ margin: '0 0 4px 0', fontSize: '20px' }}>삼성 라이온즈 공식 앱</h2>
-              <p style={{ fontSize: '13px', color: '#999' }}>Version 1.2.0 (Stable)</p>
-            </div>
-
+            <h1>설정</h1>
             <div className="premium-card">
-              <h2 style={{ fontSize: '16px', marginBottom: '18px' }}>환경 설정</h2>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid #F8F9FA' }}>
-                  <span style={{ fontSize: '14px', fontWeight: '600', color: '#333' }}>경기 알림 푸시</span>
-                  <div style={{ width: '44px', height: '24px', background: '#074CA1', borderRadius: '100px', position: 'relative' }}>
-                    <div style={{ position: 'absolute', right: '3px', top: '3px', width: '18px', height: '18px', background: '#fff', borderRadius: '50%' }}></div>
-                  </div>
+              <h2 style={{ fontSize: '16px' }}>앱 서비스 정보</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #F5F7F9' }}>
+                  <span>버전</span>
+                  <span style={{ color: '#074CA1', fontWeight: 'bold' }}>v1.2.5</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0' }}>
-                  <span style={{ fontSize: '14px', fontWeight: '600', color: '#333' }}>데이터 소스</span>
-                  <span style={{ fontSize: '12px', color: '#074CA1', fontWeight: '700' }}>KBO OFFICIAL API</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0' }}>
+                  <span>데이터 출처</span>
+                  <span>네이버 스포츠 API (Real-time)</span>
                 </div>
               </div>
             </div>
-
-            <div style={{ textAlign: 'center', marginTop: '60px', opacity: 0.2, fontSize: '10px', letterSpacing: '0.5px' }}>
-              <p>삼성 라이온즈 대시보드 프로젝트</p>
-              <p>© 2026 Samsung Lions Fans Project</p>
+            <div style={{ textAlign: 'center', marginTop: '60px', opacity: 0.2, fontSize: '10px' }}>
+              <p>삼성 라이온즈 공식 팬 서비스</p>
+              <p>© 2026 OFFICIAL APP PROJECT</p>
             </div>
           </div>
         );
@@ -210,13 +211,45 @@ export default function Home() {
           { id: 'more', icon: <MoreIcon />, label: '설정' }
         ].map((tab) => (
           <div key={tab.id} className={`nav-item ${activeTab === tab.id ? 'active' : ''}`} onClick={() => setActiveTab(tab.id)}>
-            <div style={{ width: '24px', height: '24px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              {tab.icon}
-            </div>
+            {tab.icon}
             <span>{tab.label}</span>
           </div>
         ))}
       </nav>
+
+      <style jsx global>{`
+        .live-dot {
+          width: 8px;
+          height: 8px;
+          background: #FF3B30;
+          border-radius: 50%;
+          box-shadow: 0 0 10px rgba(255, 59, 48, 0.6);
+          animation: pulse 1.5s infinite;
+        }
+
+        .score-number {
+          font-size: 52px;
+          color: #074CA1;
+          font-weight: 950;
+          letter-spacing: -2px;
+          line-height: 1;
+        }
+
+        .score-number.dark {
+          color: #1A1A1A;
+        }
+
+        .premium-card.refreshing {
+          opacity: 0.7;
+          transform: scale(0.995);
+        }
+
+        @keyframes pulse {
+          0% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.3); opacity: 0.5; }
+          100% { transform: scale(1); opacity: 1; }
+        }
+      `}</style>
     </div>
   );
 }
