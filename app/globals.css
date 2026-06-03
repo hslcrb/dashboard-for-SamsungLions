@@ -205,25 +205,6 @@ img {
   transition: all 0.3s ease;
 }
 
-/* Buttons */
-.action-button {
-  background: var(--lions-blue);
-  color: white;
-  border-radius: 16px;
-  padding: 16px;
-  font-weight: 700;
-  text-align: center;
-  transition: all 0.2s;
-  border: none;
-  width: 100%;
-  cursor: pointer;
-}
-
-.action-button:active {
-  transform: scale(0.96);
-  opacity: 0.9;
-}
-
 /* Typography */
 h1 {
   font-size: 24px;
@@ -270,4 +251,38 @@ p {
 
 .animate-fade {
   animation: fadeIn 0.5s ease forwards;
+}
+
+/* Premium Button Styles */
+.premium-action-btn {
+  position: relative;
+  width: 100%;
+  min-height: 56px;
+  background: #074CA1 !important;
+  color: #FFFFFF !important;
+  border: none;
+  border-radius: 18px;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 15px;
+  cursor: pointer;
+  overflow: hidden;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px;
+  box-shadow: 0 4px 12px rgba(7, 76, 161, 0.15);
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.premium-action-btn:hover {
+  background: #063d82 !important;
+  box-shadow: 0 6px 16px rgba(7, 76, 161, 0.25);
+}
+
+.btn-text {
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
 }
