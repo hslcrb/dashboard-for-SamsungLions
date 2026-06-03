@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { HomeIcon, MatchIcon, RankIcon, MoreIcon } from '../components/Icons';
-import { motion, AnimatePresence, useAnimation } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import PremiumButton from '../components/PremiumButton';
 
 export default function Home() {
@@ -14,9 +14,6 @@ export default function Home() {
   const [hasGame, setHasGame] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
-
-  // 물리 시뮬레이션 제어용
-  const controls = useAnimation();
 
   useEffect(() => {
     const handleContextMenu = (e) => e.preventDefault();
@@ -192,7 +189,7 @@ export default function Home() {
           <div className="premium-card about-card">
             <div className="about-logo"><Image src="/logo.svg" alt="최강삼성! 라이온즈" title="최강삼성! 라이온즈" fill style={{ objectFit: 'contain' }} /></div>
             <h2>라이언즈 팬 대시보드</h2>
-            <p>Lion Spirits Fan Project v1.4.2</p>
+            <p>Lion Spirits Fan Project v1.4.3</p>
             <div style={{ marginTop: '20px' }}>
               <PremiumButton onClick={() => setShowDetails(true)}>기술 스택 자세히 보기</PremiumButton>
             </div>
@@ -215,7 +212,6 @@ export default function Home() {
         ))}
       </nav>
 
-      {/* 물리 시뮬레이션 및 하단 확장 기반의 바텀 시트 */}
       <AnimatePresence>
         {showDetails && (
           <>
@@ -223,35 +219,34 @@ export default function Home() {
             <motion.div
               className="bottom-sheet"
               initial={{ y: "100%" }}
-              animate={{ y: "30%" }} /* 기본 노출 위치 (쫀득하게 시작) */
+              /* 
+                높이를 120vh로 소폭 조정하고, 
+                애니메이션 시작 위치를 y: "70%"로 설정하여 화면 하단부에 적절히 걸치도록 수정 
+              */
+              animate={{ y: "70%" }}
               exit={{ y: "100%" }}
               drag="y"
               /* 
-                상단 한도(-150)와 하단 닫기 한도 제어.
-                dragConstraints는 애니메이션 위치 기준입니다. 
-                y: "30%"인 상태에서 top: -150은 화면 상단으로부터 적절한 거리를 유지하게 합니다.
+                위로 드래그했을 때 화면의 절반(y: "40%") 이상 넘어가지 않도록 제어.
+                dragConstraints는 Rest position(70%) 기준의 오프셋입니다.
+                -30%는 위로 30% 높이만큼 더 올라갈 수 있음을 의미 (즉, y: 40% 지점이 한계)
               */
-              dragConstraints={{ top: -150, bottom: 50 }}
-              dragElastic={0.1}
+              dragConstraints={{ top: -250, bottom: 0 }}
+              dragElastic={0.05}
               onDragEnd={(e, info) => {
-                // 속도가 빠르거나 하단으로 많이 내려가면 닫기
-                if (info.offset.y > 150 || info.velocity.y > 500) {
-                  setShowDetails(false);
-                }
+                if (info.offset.y > 100 || info.velocity.y > 500) setShowDetails(false);
               }}
               transition={{ type: "spring", damping: 30, stiffness: 220, mass: 1 }}
               style={{
-                /* 하단이 절대 뚫리지 않도록 시트 자체를 매우 길게 구성 */
-                height: '180vh',
+                height: '140vh',
                 position: 'fixed',
                 bottom: 0,
                 zIndex: 1001,
                 background: 'white',
               }}
             >
-              /* 핸들 및 상단 내용 */
               <div className="sheet-handle" />
-              <div className="sheet-content" style={{ paddingBottom: '100px' }}>
+              <div className="sheet-content">
                 <h3 className="sheet-title">Software Specifications</h3>
                 <div className="spec-list">
                   <div className="spec-row"><span className="spec-label">Core Engine</span><span className="spec-value">Next.js v16.2.7</span></div>
@@ -294,10 +289,7 @@ export default function Home() {
         .about-logo { position: relative; width: 120px; height: 90px; margin: 0 auto 28px; }
         .disclaimer { text-align: center; margin-top: 80px; opacity: 0.2; font-size: 10px; font-weight: 700; }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1000; }
-        .bottom-sheet { 
-          border-radius: 32px 32px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,0.15); 
-          touch-action: none; overflow: hidden; /* 내부 스크롤바 제거 */
-        }
+        .bottom-sheet { border-radius: 32px 32px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,0.15); touch-action: none; overflow: hidden; }
         .sheet-handle { width: 36px; height: 5px; background: #DDD; border-radius: 10px; margin: 12px auto 32px; cursor: grab; }
         .sheet-title { font-size: 18px; font-weight: 900; color: #074CA1; margin-bottom: 28px; text-align: center; }
         .spec-list { background: #F8F9FA; border-radius: 20px; padding: 8px 20px; }
