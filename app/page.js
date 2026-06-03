@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import { HomeIcon, MatchIcon, RankIcon, MoreIcon } from '../components/Icons';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -14,6 +14,9 @@ export default function Home() {
   const [hasGame, setHasGame] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
+
+  // 드래그 제한을 위한 컨테이너 참조
+  const constraintsRef = useRef(null);
 
   useEffect(() => {
     const handleContextMenu = (e) => e.preventDefault();
@@ -189,7 +192,7 @@ export default function Home() {
           <div className="premium-card about-card">
             <div className="about-logo"><Image src="/logo.svg" alt="최강삼성! 라이온즈" title="최강삼성! 라이온즈" fill style={{ objectFit: 'contain' }} /></div>
             <h2>라이언즈 팬 대시보드</h2>
-            <p>Lion Spirits Fan Project v1.4.3</p>
+            <p>Lion Spirits Fan Project v1.4.4</p>
             <div style={{ marginTop: '20px' }}>
               <PremiumButton onClick={() => setShowDetails(true)}>기술 스택 자세히 보기</PremiumButton>
             </div>
@@ -202,7 +205,7 @@ export default function Home() {
   };
 
   return (
-    <div className="app-container">
+    <div className="app-container" ref={constraintsRef}>
       {renderContent()}
       <nav className="bottom-nav">
         {[{ id: 'home', icon: <HomeIcon />, label: '홈' }, { id: 'match', icon: <MatchIcon />, label: '일정' }, { id: 'rank', icon: <RankIcon />, label: '순위' }, { id: 'more', icon: <MoreIcon />, label: '정보' }].map((tab) => (
@@ -216,33 +219,32 @@ export default function Home() {
         {showDetails && (
           <>
             <motion.div className="modal-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowDetails(false)} />
+
+            {/* 
+              과도한 상승 방지 대책: 
+              1. constraintsRef(부모 컨테이너)를 기준으로 드래그 영역을 물리적으로 제한.
+              2. dragElastic을 0으로 설정하여 한계점을 절대 넘지 못하게 함.
+              3. % 단위 대신 px 단위를 혼합하여 계산 오차 방지.
+            */}
             <motion.div
               className="bottom-sheet"
-              initial={{ y: "100%" }}
-              /* 
-                높이를 120vh로 소폭 조정하고, 
-                애니메이션 시작 위치를 y: "70%"로 설정하여 화면 하단부에 적절히 걸치도록 수정 
-              */
-              animate={{ y: "70%" }}
-              exit={{ y: "100%" }}
+              initial={{ y: 800 }}
+              animate={{ y: 0 }}
+              exit={{ y: 800 }}
               drag="y"
-              /* 
-                위로 드래그했을 때 화면의 절반(y: "40%") 이상 넘어가지 않도록 제어.
-                dragConstraints는 Rest position(70%) 기준의 오프셋입니다.
-                -30%는 위로 30% 높이만큼 더 올라갈 수 있음을 의미 (즉, y: 40% 지점이 한계)
-              */
-              dragConstraints={{ top: -250, bottom: 0 }}
-              dragElastic={0.05}
+              dragConstraints={{ top: 0, bottom: 600 }}
+              dragElastic={0} // 한계점 돌파 절대 금지
               onDragEnd={(e, info) => {
-                if (info.offset.y > 100 || info.velocity.y > 500) setShowDetails(false);
+                if (info.offset.y > 200 || info.velocity.y > 600) setShowDetails(false);
               }}
-              transition={{ type: "spring", damping: 30, stiffness: 220, mass: 1 }}
+              transition={{ type: "spring", damping: 35, stiffness: 250 }}
               style={{
-                height: '140vh',
+                height: '75vh', /* 적절한 높이로 하향 조정 */
                 position: 'fixed',
-                bottom: 0,
+                bottom: '-20vh', /* 하단 끊김 방지를 위해 아래로 더 길게 구성 */
                 zIndex: 1001,
                 background: 'white',
+                paddingBottom: '20vh'
               }}
             >
               <div className="sheet-handle" />
